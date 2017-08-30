@@ -40,12 +40,11 @@ int main()
 			cin>>lineIn;
 			cargado.inicializarPoligono();
 			cargado=cargarPoligono(lineIn, poligonosMemoria);
-			cout<<cargado.getNombre()<<encontrado<<endl;
 			if(cargado.getNombre()=="0a")
 			{
 				cout<<"No se cargó ningun poligono"<<endl;
 			}
-			else if(cargado.getNombre()!="0a"&&poligonosMemoria.size()>0)
+			else if(cargado.getNombre()!="0a" && !poligonosMemoria.empty())
 			{
 				for(itLPoli=poligonosMemoria.begin(); itLPoli!=poligonosMemoria.end(); itLPoli++)
 				{
@@ -54,16 +53,14 @@ int main()
 						encontrado = true;
 					}
 				}
-				itLPoli=poligonosMemoria.begin();
 			}
-			else if(encontrado==true)
+			if(encontrado)
 				cout<<"Este poligono ya ha sido cargado anteriormente"<<endl;
 			else if(!encontrado)
 			{
 				poligonosMemoria.push_front(cargado);
 				cout<<"Poligono cargado correctamente"<<endl;
 			}
-			cout<<encontrado<<endl;
 			break;
 		case 2:
 			listapoligonos(poligonosMemoria);
@@ -174,13 +171,17 @@ poligono cargarPoligono(string val, std::list<poligono> &poligonosMemoria)
 void listapoligonos(list<poligono> &poligonosMemoria)
 {
 	list<poligono>::iterator itPoli;
-	if(poligonosMemoria.size()==0)
+	if(poligonosMemoria.size()==0){
 		cout<<"No hay objetos cargados en memoria\n";
+		return;
+	}
+	cout<<"=======Listado de poligonos======="<<endl;
 	for(itPoli=poligonosMemoria.begin(); itPoli!=poligonosMemoria.end(); itPoli++)
 	{
 		cout<<"Nombre: "<<itPoli->getNombre()<<" Cantidad de vertices: "<<itPoli->getCantidadVertices()<<" Cantidad de caras: "<<itPoli->getCantidadCaras()<<endl;
 		/*<<" Cantidad de aristas: "<<itPoli->getCantidadAristas() TODO: imprimir cantidad de aristas*/
 	}
+	cout<<"=================================="<<endl;
 }
 void descargarmemoria(list<poligono> &poligonosMemoria, string nombre_objeto)
 {
