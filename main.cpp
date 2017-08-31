@@ -10,6 +10,10 @@ poligono cargarPoligono(string val, list<poligono> &poligonosMemoria);
 string* tokenizador(string val);
 void listapoligonos(list<poligono> &poligonosMemoria);
 void descargarmemoria(list<poligono> &poligonosMemoria, string nombre_objeto);
+bool buscarPoligono(list<poligono> listIn, string nombreIn);
+bool guardarPoligono(string nombreObjeto, string nombreArchivo, list<poligono> listIn);
+poligono buscarPoligono2(list<poligono> listIn, string nombreIn);
+
 
 int main()
 {
@@ -17,7 +21,7 @@ int main()
 	list<poligono> poligonosMemoria;
 	list<poligono>::iterator itLPoli;
 	poligono cargado;
-	string lineIn, obj;
+	string lineIn,lineIn2, obj;
 	bool encontrado=false;
 	while(on)
 	{
@@ -75,6 +79,11 @@ int main()
 			descargarmemoria(poligonosMemoria,obj);
 			break;
 		case 6:
+			cout << "ingrese nombre del objeto" << endl;
+			cin>>lineIn;
+			cout << "ingrese nombre de archivo donde desea guardarlo" << endl;
+			cin>>lineIn2;
+			guardarPoligono(lineIn, lineIn2, poligonosMemoria);
 			break;
 		case 7:
 			on = 0;
@@ -83,90 +92,171 @@ int main()
 	}
 	return 0;
 }
-poligono cargarPoligono(string val, std::list<poligono> &poligonosMemoria)
+poligono cargarPoligono(string val, list<poligono> &poligonosMemoria)
 {
 	poligono pOut;
 	pOut.inicializarPoligono();
 	string* str;
 	string line;
 	ifstream myfile(val.c_str());
-	int cont = 1;
-	int cont2 = 1;
 	vertice vAux;
 	cara cAux;
-
+	int countE = 0;
+	int countE2 = 0;
 	if (myfile.is_open())
 	{
+		getline (myfile,line);
+		cout<<"nombre: "<< line<<endl;
+		pOut.setNombre(line);
+		getline (myfile,line);
+		cout<<"cantidad de vertices: "<< line<<endl;
+		pOut.setCantidadVertices(atoi(line.c_str()));
+		bool terminado = false;
 		while (getline (myfile,line))
 		{
-			if(line[0] == '-'&& line[1] == '1'&& line.size()==2 )
-			{
+			string strAcumX;
+			string strAcumY;
+			string strAcumZ;
+			if(line[0] == '-'&& line[1] == '1' && line.size() == 2){
 				cout<<"-1 encontrado!"<<endl;
 				break;
 			}
-			
-			str = tokenizador(line);
-
-			if(cont == 4)
-			{
-
-				cAux.tamanoCara = atoi((*str).c_str());
-				cAux.jEsimoV.y = atoi((*(str+1)).c_str());
-				cAux.jEsimoV.x = atoi((*(str+2)).c_str());
-				cAux.jEsimoV.z = atoi((*(str+3)).c_str());
-
-
-				pOut.insertarCara(cAux);
-
-
-				cout<<"----: "<<endl;
-				cout<<cont<<endl;
-				cout<<"tamanio cara: "<<pOut.getlistaCaras().front().tamanoCara<<endl;
-				cout<<"verticeX: "<<pOut.getlistaCaras().front().jEsimoV.x<<endl;
-				cout<<"verticeY: "<<pOut.getlistaCaras().front().jEsimoV.y<<endl;
-				cout<<"verticeZ: "<<pOut.getlistaCaras().front().jEsimoV.z<<endl;
-				cout<<"---- "<<endl;
-
-
+			cout<<"linea antes de tokenizar: "<< line<<endl;
+			strAcumX += line[0];
+			for(int i = 0; i < line.size(); i++){
+				if(line[i+1] == ' '){
+					vAux.x = atoi(strAcumX.c_str());
+					cout<<"x1: "<< strAcumX<<endl;
+					strAcumY += line[i+2];
+					for(int j = i+2; j <line.size(); j++){
+						if(line[j+1] == ' '){
+							vAux.y = atoi(strAcumY.c_str());
+							cout<<"y1: "<< strAcumY<<endl;
+							strAcumZ += line[j+2];
+							for(int k = j+2; k <line.size(); k++){
+								if(line[k+1] == NULL || line[k+1] == ' '){
+									countE++;
+									vAux.z = atoi(strAcumZ.c_str());
+									cout<<"Z1: "<< strAcumZ<<endl;
+									pOut.insertarVertice(vAux);
+									if(line[k+1] == NULL){
+										terminado = true;
+										break;
+									}
+									i = k;
+									strAcumX.clear();
+									strAcumY.clear();
+									strAcumZ.clear();
+									break;
+								}else
+									strAcumZ += line[k+1];
+							}
+								break;
+						}else
+							strAcumY += line[j+1];
+					}
+					if(terminado)
+						break;
 			}
-
-			if(cont == 3)
-			{
-
-				vAux.x = atoi((*str).c_str());
-				vAux.y = atoi((*(str+1)).c_str());
-				vAux.z = atoi((*(str+2)).c_str());
-				pOut.insertarVertice(vAux);
-				cout<<"----: "<<endl;
-				cout<<cont<<endl;
-				cout<<"verticeX: "<<pOut.getListaVertices().front().x<<endl;
-				cout<<"verticeY: "<<pOut.getListaVertices().front().y<<endl;
-				cout<<"verticeZ: "<<pOut.getListaVertices().front().z<<endl;
-				cout<<"---- "<<endl;
-
-				cont2++;
-				if(cont2 == pOut.getCantidadVertices()+1)
-				{
-					cont++;
-					cont2 = 1;
-				}
+				else
+					strAcumX += line[i+1];
 			}
-			if(cont == 2)
-			{
-				pOut.setCantidadVertices(atoi((*str).c_str()));
-				cont++;
-				cout<<"Cantidad de vertices: "<<pOut.getCantidadVertices()<<endl;
+			if(countE == pOut.getCantidadVertices())
+				break;
+		}
+		while (getline (myfile,line))
+		{
+			string strAcumX2;
+			string strAcumY2;
+			string strAcumZ2;
+			if(line[0] == '-'&& line[1] == '1' && line.size() == 2){
+				cout<<"-1 encontrado!"<<endl;
+				break;
 			}
-			if(cont == 1)
-			{
-				pOut.setNombre(*str);
-				cont++;
-				cout<<"Nombre: "<<pOut.getNombre()<<endl;
+			string cara;
+			int contCara = 0;
+			for(int i = 0; i < line.size(); i++){
+				cara+= line[i];
+				contCara ++;
+				if(line[i+1]== ' ')
+					break;
+			}
+			cAux.tamanoCara = atoi(cara.c_str());
+			cout<<"linea2 antes de tokenizar: "<< line<<endl;
+			cout<< "tamanio cara: "<< cAux.tamanoCara<<endl;
+			strAcumX2 += line[contCara];
+			for(int i = 1; i <=line.size(); i++){
+				if(line[i+1] == ' '){
+					cAux.jEsimoV.x = atoi(strAcumX2.c_str());
+					cout<<"x2: "<< strAcumX2<<endl;
+					strAcumY2 += line[i+2];
+					for(int j = i+2; j <=line.size(); j++){
+						if(line[j+1] == ' '){
+							cAux.jEsimoV.y = atoi(strAcumY2.c_str());
+							cout<<"y2: "<< strAcumY2<<endl;
+							strAcumZ2 += line[j+2];
+							for(int k = j+2; k <=line.size(); k++){
+								if(line[k+1] == NULL || line[k+1] == ' ' ){
+									cAux.jEsimoV.z = atoi(strAcumZ2.c_str());
+									cout<<"z2: "<< strAcumZ2<<endl;
+									pOut.insertarCara(cAux);
+									break;
+								}else
+									strAcumZ2 += line[k+1];
+							}
+							break;
+						}else
+							strAcumY2 += line[j+1];
+					}
+					break;
+				}else
+					strAcumX2 += line[i+1];
 			}
 		}
 		myfile.close();
 	}
+	else cout << "Unable to open file";
 	return pOut;
+}
+bool buscarPoligono(list<poligono> listIn, string nombreIn){
+for(list<poligono>::iterator buscaItera = listIn.begin(); buscaItera != listIn.end();buscaItera++)
+	if((*buscaItera).getNombre() == nombreIn)
+		return true;
+
+	return false;
+}
+poligono buscarPoligono2(list<poligono> listIn, string nombreIn){
+	poligono aux;
+	aux.inicializarPoligono();
+	for(list<poligono>::iterator buscaItera = listIn.begin(); buscaItera != listIn.end();buscaItera++)
+		if((*buscaItera).getNombre() == nombreIn)
+			return (*buscaItera);
+	return aux;
+}
+bool guardarPoligono(string nombreObjeto, string nombreArchivo, list<poligono> listIn){
+	poligono pAux;
+	list<vertice> listaVAux;
+	list<cara> listaCAux;
+	if(buscarPoligono(listIn, nombreObjeto)){
+		pAux = buscarPoligono2(listIn, nombreObjeto);
+		ofstream myfile;
+		myfile.open (nombreArchivo.c_str());
+		myfile << pAux.getNombre()<<"\n";
+		myfile << pAux.getCantidadVertices()<<"\n";
+		listaVAux = pAux.getListaVertices();
+		listaCAux = pAux.getlistaCaras();
+		for(list<vertice>::iterator buscaIteraV = listaVAux.begin(); buscaIteraV != listaVAux.end();buscaIteraV++)
+			myfile <<(*buscaIteraV).x<<" " <<(*buscaIteraV).y<<" " <<(*buscaIteraV).z<<"\n";
+		for(list<cara>::iterator buscaIteraC = listaCAux.begin(); buscaIteraC != listaCAux.end();buscaIteraC++)
+			myfile <<(*buscaIteraC).tamanoCara<<" " <<(*buscaIteraC).jEsimoV.x<<" " <<(*buscaIteraC).jEsimoV.y<<" "<<(*buscaIteraC).jEsimoV.z<<"\n";
+		myfile <<"-1"<<"\n";
+		myfile.close();
+		return true;
+	}
+	else{
+		cout<<"No se encontro el nombre en memoria"<<endl;
+		return false;
+	}
 }
 void listapoligonos(list<poligono> &poligonosMemoria)
 {
@@ -199,44 +289,4 @@ void descargarmemoria(list<poligono> &poligonosMemoria, string nombre_objeto)
 		cout<<"El objeto fue descargado exitosamente."<<endl;
 	else
 		cout<<"El objeto no fue encontrado para su descarga."<<endl;
-}
-string* tokenizador(std::string val)
-{
-	int tam = 0;
-	int ini = 0;
-	int fin = 0;
-	for(int i = 0; i < val.size(); i++)
-		if(val[i] == ' ')
-			tam++;
-	string* strOut = new string[tam+1];
-	if(tam > 0)
-	{
-		int cont = 0;
-		for(int i = 0; i < val.size(); i++)
-		{
-	
-			if(val[i] == ' ' || (i+1 == val.size()))
-			{
-
-				for(int j = ini; j < i; j++)
-				{
-					*(strOut + cont) += val[j];
-			
-					if((i+1 == val.size()))
-					{
-						*(strOut + tam) = val[val.size()-1];
-
-					}
-				}
-				cont++;
-				ini = i;
-			}
-		}
-
-	}
-	else
-	{
-		*strOut = val;
-	}
-	return strOut;
 }
