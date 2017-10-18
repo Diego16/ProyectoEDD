@@ -69,7 +69,7 @@ int main()
 			guardarPoligono(lineIn, lineIn2, poligonosMemoria);
 		if (strcmp(code,"ayuda")==0){
 			if(file==nullptr){
-				cout<<endl<<"Comandos disponibles: "<<endl<<"   cargar"<<endl<<"   listado"<<endl<<"   envolvente"<<endl<<"   descargar"<<endl<<"   envolvente"<<endl<<"   salir"<<endl;
+				cout<<endl<<"Comandos disponibles: "<<endl<<"   cargar"<<endl<<"   listado"<<endl<<"   envolvente"<<endl<<"   descargar"<<endl<<"   guardar"<<"   v_cercanos"<<endl<<"   salir"<<endl;
 			}
 			else{
 				if(strcmp(file,"")==0)
@@ -79,7 +79,7 @@ int main()
 				if(strcmp(file,"")==0)
 					cout<<""<<endl;
 				if(strcmp(file,"salir")==0)
-					cout<<"cout<<"Termina la ejecucion de la aplicacion."<<endl;"<<endl;
+					cout<<"Termina la ejecucion de la aplicacion."<<endl;
 			}
 		}
 		if(strcmp(code,"salir")==0)
