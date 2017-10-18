@@ -36,7 +36,8 @@ int main()
 		file=strtok(cadena," ");
 		code=file;
 		file=strtok(nullptr," ");
-		cout<<"============"<<file<<"+++++++++"<<code<<endl;
+		//cout<<"============"<<file<<"+++++++++"<<code<<endl;
+		cout<<"=========="<<poligonosMemoria.size()<<endl;
 		if(strcmp(code,"cargar")==0)
 		{
 			string lineIn=file;
@@ -60,6 +61,7 @@ int main()
 			}
 		}
 		if(strcmp(code,"listado")==0)
+			cout<<"=========="<<poligonosMemoria.size()<<endl;
 			listapoligonos(poligonosMemoria);
 		if(strcmp(code,"envolvente")==0)
 			envolventes.push_front(envolvente(lineIn, poligonosMemoria));
@@ -268,6 +270,7 @@ bool guardarPoligono(string nombreObjeto, string nombreArchivo, list<poligono> l
 void listapoligonos(list<poligono> &poligonosMemoria)
 {
 	list<poligono>::iterator itPoli;
+	cout<<"=========="<<poligonosMemoria.size()<<endl;
 	if(poligonosMemoria.size()<=0)
 	{
 		cout<<"No hay objetos cargados en memoria\n";
