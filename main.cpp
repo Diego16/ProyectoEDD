@@ -1,6 +1,7 @@
 #include <iostream>
 #include "poligono.h"
 #include "poligono.hpp"
+#include "BinaryTree.h"
 #include <fstream>
 #include <string>
 #include <stdlib.h>
@@ -15,6 +16,10 @@ bool buscarPoligono(list<poligono> listIn, string nombreIn);
 bool guardarPoligono(string nombreObjeto, string nombreArchivo, list<poligono> listIn);
 poligono buscarPoligono2(list<poligono> listIn, string nombreIn);
 poligono envolvente(string nombreObjeto, list<poligono> listIn);
+float* componente2Punto1(string nombrePoligono, list<poligono> poligonosMemoria, float x, float y, float z, bool on);
+void componente2Punto2(list<poligono> poligonosMemoria, float x, float y, float z);
+void componente2Punto3(string nombrePoligono,list<poligono> poligonosMemoria);
+float* calcularDistancia( float x, float y, float z, float x2, float y2, float z2);
 
 
 int main()
@@ -24,68 +29,161 @@ int main()
 	list<poligono> envolventes;
 	list<poligono>::iterator itLPoli;
 	poligono cargado;
-	char* code;
-	char* file;
-	string lineIn,lineIn2, obj, com;
 	bool encontrado=false;
+	string lineIn, lineIn2;
 	while(on)
 	{
-		cout<<endl<<"Ingrese el comando"<<endl<<"$";
-		getline(cin,com);
-		char* cadena=strdup(com.c_str());
-		file=strtok(cadena," ");
-		code=file;
-		file=strtok(nullptr," ");
-		//cout<<"============"<<file<<"+++++++++"<<code<<endl;
-		cout<<"=========="<<poligonosMemoria.size()<<endl;
-		if(strcmp(code,"cargar")==0)
+		cout<<"$";
+		char comando[300];
+		cin.getline(comando,300);
+		char * pch;
+		list<char*> milista;
+		pch = strtok (comando," ");
+		while (pch != NULL)
 		{
-			string lineIn=file;
-			encontrado = false;
-			cargado.inicializarPoligono();
-			cargado=cargarPoligono(lineIn, poligonosMemoria);
-			if(cargado.getNombre()=="0a")
+			milista.push_back(pch);
+			pch = strtok (NULL, " ");
+		}
+		list<char*>::iterator it=milista.begin();
+		string comando1=*it;
+		if (comando1=="cargar")
+		{
+			if (milista.size()==2)
 			{
-				cout<<"No se cargó ningun poligono"<<endl;
+				it++;
+				lineIn=*it;
+				cargado.inicializarPoligono();
+				cargado=cargarPoligono(lineIn, poligonosMemoria);
+				if(cargado.getNombre()=="0a")
+				{
+					cout<<"No se cargó ningun poligono"<<endl;
+				}
+				else if(cargado.getNombre()!="0a" && !poligonosMemoria.empty())
+				{
+					encontrado = buscarPoligono(poligonosMemoria,cargado.getNombre());
+				}
+				if(encontrado)
+					cout<<"Este poligono ya ha sido cargado anteriormente"<<endl;
+				else if(!encontrado)
+				{
+					poligonosMemoria.push_front(cargado);
+					cout<<"Poligono cargado correctamente"<<endl;
+				}
 			}
-			else if(cargado.getNombre()!="0a" && !poligonosMemoria.empty())
+			else
 			{
-				encontrado = buscarPoligono(poligonosMemoria,cargado.getNombre());
-			}
-			if(encontrado)
-				cout<<"Este poligono ya ha sido cargado anteriormente"<<endl;
-			else if(!encontrado)
-			{
-				poligonosMemoria.push_front(cargado);
-				cout<<"Poligono cargado correctamente"<<endl;
+				cout<< "Parametros invalidos"<<endl;
 			}
 		}
-		if(strcmp(code,"listado")==0)
-			cout<<"=========="<<poligonosMemoria.size()<<endl;
+		else if(comando1=="listado")
 			listapoligonos(poligonosMemoria);
-		if(strcmp(code,"envolvente")==0)
-			envolventes.push_front(envolvente(lineIn, poligonosMemoria));
-		if(strcmp(code,"descargar")==0)
-			descargarmemoria(poligonosMemoria,lineIn);
-		if(strcmp(code,"guardar")==0)
-			guardarPoligono(lineIn, lineIn2, poligonosMemoria);
-		if (strcmp(code,"ayuda")==0){
-			if(file==nullptr){
-				cout<<endl<<"Comandos disponibles: "<<endl<<"   cargar"<<endl<<"   listado"<<endl<<"   envolvente"<<endl<<"   descargar"<<endl<<"   guardar"<<"   v_cercanos"<<endl<<"   salir"<<endl;
+		else if(comando1=="envolvente")
+		{
+			if (milista.size()==2)
+			{
+				it++;
+				lineIn=*it;
+				envolventes.push_front(envolvente(lineIn, poligonosMemoria));
 			}
-			else{
-				if(strcmp(file,"")==0)
-					cout<<""<<endl;
-				if(strcmp(file,"")==0)
-					cout<<""<<endl;
-				if(strcmp(file,"")==0)
-					cout<<""<<endl;
-				if(strcmp(file,"salir")==0)
-					cout<<"Termina la ejecucion de la aplicacion."<<endl;
+			else if (milista.size()==1)
+			{
+				lineIn="all";
+				envolventes.push_front(envolvente(lineIn, poligonosMemoria));	
+			}
+			else
+			{
+				cout<< "Parametros invalidos"<<endl;
 			}
 		}
-		if(strcmp(code,"salir")==0)
+		else if(comando1=="descargar"){
+			if (milista.size()==2)
+			{
+				it++;
+				lineIn=*it;
+				descargarmemoria(poligonosMemoria,lineIn);
+			}
+			else
+			{
+				cout<< "Parametros invalidos"<<endl;
+			}
+		}
+		else if(comando1=="guardar")
+		{
+			if (milista.size()==3)
+			{
+				it++;
+				lineIn=*it;
+				it++;
+				lineIn2=*it;
+				guardarPoligono(lineIn, lineIn2, poligonosMemoria);
+			}
+			else
+				cout<< "Parametros invalidos"<<endl;
+		}
+		else if(comando1=="v_cercano")
+		{
+			if (milista.size()==5)
+			{
+				it++;
+				float x=stof(*it);
+				it++;
+				float y=stof(*it);
+				it++;
+				float z=stof(*it);
+				it++;
+				lineIn=*it;
+				componente2Punto1(lineIn,poligonosMemoria,x,y,z,false);
+			}
+			else if (milista.size()==4)
+			{
+				it++;
+				float x=stof(*it);
+				it++;
+				float y=stof(*it);
+				it++;
+				float z=stof(*it);
+				componente2Punto2(poligonosMemoria,x,y,z);
+			}
+		}
+		else if(comando1=="v_cercanos_caja")
+		{
+			if (milista.size()==2)
+			{
+				it++;
+				lineIn=*it;
+				componente2Punto3(lineIn,poligonosMemoria);
+			}
+		}
+		else if(comando1=="ayuda"){
+			if (milista.size()==1)
+			{
+				cout<<endl<<"Comandos disponibles: "<<endl<<"   cargar"<<endl<<"   listado"<<endl<<"   envolvente"<<endl<<"   descargar"<<endl<<"   guardar"<<endl<<"   v_cercano"<<endl<<"   v_cercanos_caja"<<endl<<"   salir"<<endl;
+			}
+			else if (milista.size()==2){
+				it++;
+				lineIn=*it;
+				if(lineIn=="cargar")
+					cout<<"===cargar <nombre_archivo>"<<endl<<"====Carga en memoria la información del objeto nombre_objeto contenida en el archivo identificado por nombre_archivo"<<endl;
+				if(lineIn=="listado")
+					cout<<"===listado"<<endl<<"====Lista los objetos cargados actualmente en memoria, junto con la información básica de cada uno: cantidad de puntos, de aristas y de caras."<<endl;
+				if(lineIn=="envolvente")
+					cout<<"===envolvente / envolvente <nombre_archivo>"<<endl<<"====Calcula la caja envolvente del objeto identificado por nombre_objeto, si no se ingresa nombre_objeto se calcula la caja que envuelve todos los objetos."<<endl;
+				if(lineIn=="descargar")
+					cout<<"===descargar <nombre_objeto>"<<endl<<"====Descarga de la memoria toda la información básica (vértices, aristas, caras) del objeto identificado por nombre_objeto."<<endl;
+				if(lineIn=="guardar")
+					cout<<"===guardar <nombre_objeto nombre_archivo>"<<endl<<"====Escribe en un archivo de texto, identificado por nombre_archivo, la información básica (vértices y caras) del objeto identificado por nombre_objeto."<<endl;
+				if(lineIn=="v_cercano")
+					cout<<"===v_cercano <x y z nombre_objeto> / v_cercano <x y z>"<<endl<<"====Identifica el vértice del objeto nombre_objeto más cercano al punto indicado por las coordenadas px , py y pz. En caso de no ingresarse nombre_objeto se calcula el vertice mas cercano al punto entre todos los objetos"<<endl;
+				if(lineIn=="v_cercano_caja")
+					cout<<"===v_cercanos_caja <nombre_objeto>"<<endl<<"====Identifica los vértices del objeto nombre_objeto más cercanos a los puntos (vértices) que definen la respectiva caja envolvente del objeto."<<endl;
+				if(lineIn=="salir")
+					cout<<"===salir"<<endl<<"====Termina la ejecucion de la aplicacion."<<endl;
+			}
+		}
+		else if(comando1=="salir")
 			on = false;
+		else
+			cout<<"===Comando no valido"<<endl;
 	}
 	return 0;
 }
@@ -270,7 +368,6 @@ bool guardarPoligono(string nombreObjeto, string nombreArchivo, list<poligono> l
 void listapoligonos(list<poligono> &poligonosMemoria)
 {
 	list<poligono>::iterator itPoli;
-	cout<<"=========="<<poligonosMemoria.size()<<endl;
 	if(poligonosMemoria.size()<=0)
 	{
 		cout<<"No hay objetos cargados en memoria\n";
@@ -313,26 +410,30 @@ poligono envolvente(string nombreObjeto, list<poligono> listIn)
 	list<vertice>::iterator itVert;
 	list<cara> listaCAux;
 	list<cara>::iterator itCara;
+	list<poligono>::iterator itPoli;
 	cara careishon;
-
-	if(buscarPoligono(listIn, nombreObjeto))
+	if(nombreObjeto=="all")
 	{
-		pObj = buscarPoligono2(listIn, nombreObjeto);
-		for(itVert=pObj.getListaVertices().begin();itVert!=pObj.getListaVertices().end();itVert++)
+		for(itPoli=listIn.begin(); itPoli!=listIn.end(); itPoli++)
 		{
-			if(itVert->x>auxmax.x)
-				auxmax.x=itVert->x;
-			if(itVert->y>auxmax.y)
-				auxmax.y=itVert->y;
-			if(itVert->z>auxmax.z)
-				auxmax.z=itVert->z;
-			if(itVert->x<auxmin.x)
-				auxmin.x=itVert->x;
-			if(itVert->y<auxmin.y)
-				auxmin.y=itVert->y;
-			if(itVert->z<auxmin.z)
-				auxmin.z=itVert->z;
+			pObj=*itPoli;
+			for(itVert=pObj.getListaVertices().begin();itVert!=pObj.getListaVertices().end();itVert++)
+			{
+				if(itVert->x>auxmax.x)
+					auxmax.x=itVert->x;
+				if(itVert->y>auxmax.y)
+					auxmax.y=itVert->y;
+				if(itVert->z>auxmax.z)
+					auxmax.z=itVert->z;
+				if(itVert->x<auxmin.x)
+					auxmin.x=itVert->x;
+				if(itVert->y<auxmin.y)
+					auxmin.y=itVert->y;
+				if(itVert->z<auxmin.z)
+					auxmin.z=itVert->z;
+			}
 		}
+		pObj = buscarPoligono2(listIn, nombreObjeto);
 		listaVAux.push_front(auxmax);
 		aux.x=auxmax.x;
 		aux.y=auxmin.y;
@@ -359,26 +460,84 @@ poligono envolvente(string nombreObjeto, list<poligono> listIn)
 		aux.z=auxmax.z;
 		listaVAux.push_front(aux);
 		listaVAux.push_front(auxmin);
-
 		careishon.tamanoCara = abs(auxmax.x - auxmin.x)* abs(auxmax.y - auxmin.y);
 		careishon.jEsimoV = auxmin;
 		listaCAux.push_front(careishon);
 		careishon.jEsimoV = auxmax;
 		listaCAux.push_front(careishon);
-
 		careishon.tamanoCara = abs(auxmax.y - auxmin.y)* abs(auxmax.z - auxmin.z);
 		careishon.jEsimoV = auxmin;
 		listaCAux.push_front(careishon);
 		careishon.jEsimoV = auxmax;
 		listaCAux.push_front(careishon);
-
 		careishon.tamanoCara = abs(auxmax.x - auxmin.x)* abs(auxmax.z - auxmin.z);
 		careishon.jEsimoV = auxmin;
 		listaCAux.push_front(careishon);
 		careishon.jEsimoV = auxmax;
 		listaCAux.push_front(careishon);
-
-
+		pAux.setListaVertices(listaVAux);
+		pAux.setCantidadVertices(8);
+		pAux.setlistaCaras(listaCAux);
+	}
+	else if(buscarPoligono(listIn, nombreObjeto))
+	{
+		for(itVert=pObj.getListaVertices().begin();itVert!=pObj.getListaVertices().end();itVert++)
+		{
+			if(itVert->x>auxmax.x)
+				auxmax.x=itVert->x;
+			if(itVert->y>auxmax.y)
+				auxmax.y=itVert->y;
+			if(itVert->z>auxmax.z)
+				auxmax.z=itVert->z;
+			if(itVert->x<auxmin.x)
+				auxmin.x=itVert->x;
+			if(itVert->y<auxmin.y)
+				auxmin.y=itVert->y;
+			if(itVert->z<auxmin.z)
+				auxmin.z=itVert->z;
+		}
+		pObj = buscarPoligono2(listIn, nombreObjeto);
+		listaVAux.push_front(auxmax);
+		aux.x=auxmax.x;
+		aux.y=auxmin.y;
+		aux.z=auxmax.z;
+		listaVAux.push_front(aux);
+		aux.x=auxmax.x;
+		aux.y=auxmin.y;
+		aux.z=auxmin.z;
+		listaVAux.push_front(aux);
+		aux.x=auxmax.x;
+		aux.y=auxmax.y;
+		aux.z=auxmin.z;
+		listaVAux.push_front(aux);
+		aux.x=auxmin.x;
+		aux.y=auxmax.y;
+		aux.z=auxmax.z;
+		listaVAux.push_front(aux);
+		aux.x=auxmin.x;
+		aux.y=auxmax.y;
+		aux.z=auxmin.z;
+		listaVAux.push_front(aux);
+		aux.x=auxmin.x;
+		aux.y=auxmin.y;
+		aux.z=auxmax.z;
+		listaVAux.push_front(aux);
+		listaVAux.push_front(auxmin);
+		careishon.tamanoCara = abs(auxmax.x - auxmin.x)* abs(auxmax.y - auxmin.y);
+		careishon.jEsimoV = auxmin;
+		listaCAux.push_front(careishon);
+		careishon.jEsimoV = auxmax;
+		listaCAux.push_front(careishon);
+		careishon.tamanoCara = abs(auxmax.y - auxmin.y)* abs(auxmax.z - auxmin.z);
+		careishon.jEsimoV = auxmin;
+		listaCAux.push_front(careishon);
+		careishon.jEsimoV = auxmax;
+		listaCAux.push_front(careishon);
+		careishon.tamanoCara = abs(auxmax.x - auxmin.x)* abs(auxmax.z - auxmin.z);
+		careishon.jEsimoV = auxmin;
+		listaCAux.push_front(careishon);
+		careishon.jEsimoV = auxmax;
+		listaCAux.push_front(careishon);
 		pAux.setListaVertices(listaVAux);
 		pAux.setCantidadVertices(8);
 		pAux.setlistaCaras(listaCAux);
@@ -387,4 +546,101 @@ poligono envolvente(string nombreObjeto, list<poligono> listIn)
 	else
 		cout<<"No se encontro el objeto en memoria"<<endl;
 	return pAux;
+}
+float* componente2Punto1(string nombrePoligono, list<poligono> poligonosMemoria, float x, float y, float z, bool on)
+{
+    if(buscarPoligono(poligonosMemoria, nombrePoligono))
+    {
+         poligono aux = buscarPoligono2(poligonosMemoria, nombrePoligono);
+         list<vertice> listaP = aux.getListaVertices();
+         BinaryTree<float> arbolAux;
+         vertice vAux;
+         float* valorOut = new float;
+         while(!listaP.empty())
+         {
+            cout<<"listaP.front.x: "<< listaP.front().x<< endl;
+            cout<<"listaP.front.y: "<< listaP.front().y<< endl;
+            cout<<"listaP.front.z: "<< listaP.front().z<< endl;
+            cout<<"distancia calculada: "<< *(calcularDistancia(listaP.front().x, listaP.front().y, listaP.front().z, x, y, z))<< endl;
+            arbolAux.insert(*(calcularDistancia(listaP.front().x, listaP.front().y, listaP.front().z, x, y, z)));
+            listaP.pop_front();
+         }
+         listaP = aux.getListaVertices();
+         int i = 1;
+         *valorOut = arbolAux.min();
+         if(on)
+         	return valorOut;
+         while(!listaP.empty())
+         {
+            if(arbolAux.min() == *calcularDistancia(listaP.front().x, listaP.front().y, listaP.front().z, x, y, z))
+            {
+                cout<<"--Del poligono "<< nombrePoligono<< ", el vertice numero "<< i
+                <<  " con coordenadas ["<< listaP.front().x<<", "<<listaP.front().y
+                <<", "<<listaP.front().z << "] es el mas cercano al punto [" <<x<<", "<<y<<", "<<z<<"] una distacia de "<< arbolAux.min() << " unidades--"<<endl;
+                return valorOut;
+            }
+            i++;
+            listaP.pop_front();
+         }
+    }
+    else
+    {
+        cout<<"El poligono no se encontro en memoria"<<endl;
+    }
+    return 0;
+}
+void componente2Punto2(list<poligono> poligonosMemoria, float x, float y, float z)
+{
+    list<poligono> listaAux = poligonosMemoria;
+    BinaryTree<float> arbolAux;
+    if(!poligonosMemoria.empty())
+    {
+        while(!listaAux.empty())
+        {
+            arbolAux.insert(*componente2Punto1(listaAux.front().getNombre(), poligonosMemoria, x, y, z, true));
+            listaAux.pop_front();
+        }
+        listaAux = poligonosMemoria;
+        while(!listaAux.empty())
+        {
+            if(arbolAux.min() == *componente2Punto1(listaAux.front().getNombre(), poligonosMemoria, x, y, z, true))
+            {
+                float ans = *componente2Punto1(listaAux.front().getNombre(), poligonosMemoria, x, y, z, false);
+            }
+            listaAux.pop_front();
+        }
+    }
+    else
+    {
+        cout<<"No hay poligonos en memoria"<<endl;
+    }
+}
+void componente2Punto3(string nombrePoligono,list<poligono> poligonosMemoria)
+{
+    poligono envolvente1;
+    BinaryTree<float> arbolAux;
+    vertice vAux;
+    if(buscarPoligono(poligonosMemoria, nombrePoligono))
+    {
+        envolvente1 = envolvente(nombrePoligono,  poligonosMemoria);
+        list<vertice> listaP = envolvente1.getListaVertices();
+        while(!listaP.empty())
+        {
+                componente2Punto1(nombrePoligono, poligonosMemoria, listaP.front().x, listaP.front().y, listaP.front().z, false);
+                cout<< "Esquina de la envolvente de dicho objeto"<<endl;
+        }
+
+    }
+    else
+    {
+
+        cout<<"El poligono no esta en memoria"<<endl;
+    }
+
+}
+float* calcularDistancia( float x, float y, float z, float x2, float y2, float z2)
+{
+    float* out = new float;
+    *out = abs(sqrt( pow((x2 - x),2) + pow((y2 - y),2) + pow((z2 - z),2)));
+    return out;
 }
