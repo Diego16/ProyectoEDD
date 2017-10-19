@@ -187,7 +187,7 @@ int main()
 	}
 	return 0;
 }
-poligono cargarPoligono(string val, list<poligono> &poligonosMemoria)
+poligono cargarPoligono(string val, std::list<poligono> &poligonosMemoria)
 {
 	poligono pOut;
 	pOut.inicializarPoligono();
@@ -212,47 +212,46 @@ poligono cargarPoligono(string val, list<poligono> &poligonosMemoria)
 			string strAcumX;
 			string strAcumY;
 			string strAcumZ;
-			if(line[0] == '-'&& line[1] == '1' && line.size() == 2)
-			{
+
+			if(line[0] == '-'&& line[1] == '1' && line.size() == 2){
 				break;
 			}
 			strAcumX += line[0];
-			for(int i = 0; i < line.size(); i++)
-			{
-				if(line[i+1] == ' ')
-				{
-					vAux.x = stof(strAcumX.c_str());
+			for(int i = 0; i < line.size(); i++){
+
+				if(line[i+1] == ' '){
+
+					vAux.x = atoi(strAcumX.c_str());
 					strAcumY += line[i+2];
-					for(int j = i+2; j <line.size(); j++)
-					{
+					for(int j = i+2; j <line.size(); j++){
 						if(line[j+1] == ' '){
-							vAux.y = stof(strAcumY.c_str());
+
+							vAux.y = atoi(strAcumY.c_str());
 							strAcumZ += line[j+2];
-							for(int k = j+2; k <line.size(); k++)
-							{
-								if(line[k+1] == ' ')
-								{
+							for(int k = j+2; k <line.size(); k++){
+								if(line[k+1] == NULL || line[k+1] == ' '){
 									countE++;
-									vAux.z = stof(strAcumZ.c_str());
+									vAux.z = atoi(strAcumZ.c_str());
 									pOut.insertarVertice(vAux);
-									if(line[k+1] == ' ')
-									{
+									if(line[k+1] == NULL){
 										terminado = true;
 										break;
 									}
+
 									i = k;
 									strAcumX.clear();
 									strAcumY.clear();
 									strAcumZ.clear();
+                                    //strAcumX += line[i];
+
 									break;
-								}
-								else
-									strAcumZ += line[k+1];
+								}else
+								strAcumZ += line[k+1];
 							}
+
 							break;
-						}
-						else
-							strAcumY += line[j+1];
+						}else
+						strAcumY += line[j+1];
 					}
 					if(terminado)
 						break;
@@ -268,14 +267,12 @@ poligono cargarPoligono(string val, list<poligono> &poligonosMemoria)
 			string strAcumX2;
 			string strAcumY2;
 			string strAcumZ2;
-			if(line[0] == '-'&& line[1] == '1' && line.size() == 2)
-			{
+			if(line[0] == '-'&& line[1] == '1' && line.size() == 2){
 				break;
 			}
 			string cara;
 			int contCara = 0;
-			for(int i = 0; i < line.size(); i++)
-			{
+			for(int i = 0; i < line.size(); i++){
 				cara+= line[i];
 				contCara ++;
 				if(line[i+1]== ' ')
@@ -283,31 +280,25 @@ poligono cargarPoligono(string val, list<poligono> &poligonosMemoria)
 			}
 			cAux.tamanoCara = atoi(cara.c_str());
 			strAcumX2 += line[contCara];
-			for(int i = 1; i <=line.size(); i++)
-			{
-				if(line[i+1] == ' ')
-				{
+			for(int i = 1; i <=line.size(); i++){
+				if(line[i+1] == ' '){
 					cAux.jEsimoV.x = atoi(strAcumX2.c_str());
 					strAcumY2 += line[i+2];
 					for(int j = i+2; j <=line.size(); j++){
-						if(line[j+1] == ' ')
-						{
+						if(line[j+1] == ' '){
 							cAux.jEsimoV.y = atoi(strAcumY2.c_str());
 							strAcumZ2 += line[j+2];
 							for(int k = j+2; k <=line.size(); k++){
-								if(line[k+1] == ' ' )
-								{
+								if(line[k+1] == NULL || line[k+1] == ' ' ){
 									cAux.jEsimoV.z = atoi(strAcumZ2.c_str());
 									pOut.insertarCara(cAux);
 									break;
-								}
-								else
-									strAcumZ2 += line[k+1];
+								}else
+								strAcumZ2 += line[k+1];
 							}
 							break;
-						}
-						else
-							strAcumY2 += line[j+1];
+						}else
+						strAcumY2 += line[j+1];
 					}
 					break;
 				}
@@ -317,7 +308,8 @@ poligono cargarPoligono(string val, list<poligono> &poligonosMemoria)
 		}
 		myfile.close();
 	}
-	else cout << "No se pudo abrir el archivo"<<endl;
+	else 
+		cout << "Unable to open file";
 	return pOut;
 }
 bool buscarPoligono(list<poligono> listIn, string nombreIn)
