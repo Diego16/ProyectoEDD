@@ -473,118 +473,82 @@ poligono envolvente(string nombreObjeto, list<poligono> listIn)
 	}
 	else if(buscarPoligono(listIn, nombreObjeto))
 	{
-		cout<<"======ENTRO ENVOLVENTE ARCHIVO======"<<endl;
 		int i=0;
 		pObj = buscarPoligono2(listIn, nombreObjeto);
-		cout<<pObj.getListaVertices().size()<<endl;
 		for(itVert=pObj.getListaVertices().begin();itVert!=pObj.getListaVertices().end();itVert++)
 		{
-			cout<<"======ENTRO FOR por "<<i<<" vez ENVOLVENTE ARCHIVO======"<<endl;
-			cout<<"======X "<<itVert->x<<"======Y "<<itVert->y<<"======Z "<<itVert->z<<"===="<<endl;
+
+
 			if(itVert->x>auxmax.x)
 			{	
-				cout<<"======ENTRO IF X MAX======"<<endl;
 				auxmax.x=itVert->x;
 			}
-			else
-				cout<<"======NO ENTRO IF X MAX======"<<endl;
 			if(itVert->y>auxmax.y)
 			{	
-				cout<<"======ENTRO IF Y MAX======"<<endl;
 				auxmax.y=itVert->y;
 			}
-			else
-				cout<<"======NO ENTRO IF Y MAX======"<<endl;
 			if(itVert->z>auxmax.z)
 			{
-				cout<<"======ENTRO IF Z MAX======"<<endl;
 				auxmax.z=itVert->z;
 			}
-			else
-				cout<<"======NO ENTRO IF Z MAX======"<<endl;
 			if(itVert->x<auxmin.x)
 			{
-				cout<<"======ENTRO IF X MIN======"<<endl;
 				auxmin.x=itVert->x;
 			}
-			else
-				cout<<"======NO ENTRO IF X MIN======"<<endl;
 			if(itVert->y<auxmin.y)
 			{
-				cout<<"======ENTRO IF Y MIN======"<<endl;
 				auxmin.y=itVert->y;
 			}
-			else
-				cout<<"======NO ENTRO IF Y MIN======"<<endl;
 			if(itVert->z<auxmin.z)
 			{
-				cout<<"======ENTRO IF Z MIN======"<<endl;
 				auxmin.z=itVert->z;
 			}
-			else
-				cout<<"======NO ENTRO IF Z MIN======"<<endl;
 			i++;
 		}
 		listaVAux.push_front(auxmax);
-		cout<<"======MAXIMO PUNTO======"<<endl;
 		aux.x=auxmax.x;
 		aux.y=auxmin.y;
 		aux.z=auxmax.z;
 		listaVAux.push_front(aux);
-		cout<<"======PRIMER PUNTO======"<<endl;
 		aux.x=auxmax.x;
 		aux.y=auxmin.y;
 		aux.z=auxmin.z;
 		listaVAux.push_front(aux);
-		cout<<"======SEGUNDO PUNTO======"<<endl;
 		aux.x=auxmax.x;
 		aux.y=auxmax.y;
 		aux.z=auxmin.z;
 		listaVAux.push_front(aux);
-		cout<<"======TERCER PUNTO======"<<endl;
 		aux.x=auxmin.x;
 		aux.y=auxmax.y;
 		aux.z=auxmax.z;
 		listaVAux.push_front(aux);
-		cout<<"======CUARTO PUNTO======"<<endl;
 		aux.x=auxmin.x;
 		aux.y=auxmax.y;
 		aux.z=auxmin.z;
 		listaVAux.push_front(aux);
-		cout<<"======QUINTO PUNTO======"<<endl;
 		aux.x=auxmin.x;
 		aux.y=auxmin.y;
 		aux.z=auxmax.z;
 		listaVAux.push_front(aux);
-		cout<<"======SEXTO PUNTO======"<<endl;
 		listaVAux.push_front(auxmin);
-		cout<<"======MINIMO PUNTO======"<<endl;
 		careishon.tamanoCara = abs(auxmax.x - auxmin.x)* abs(auxmax.y - auxmin.y);
 		careishon.jEsimoV = auxmin;
 		listaCAux.push_front(careishon);
-		cout<<"======PRIMERA CARA======"<<endl;
 		careishon.jEsimoV = auxmax;
 		listaCAux.push_front(careishon);
-		cout<<"======SEGUNDA CARA======"<<endl;
 		careishon.tamanoCara = abs(auxmax.y - auxmin.y)* abs(auxmax.z - auxmin.z);
 		careishon.jEsimoV = auxmin;
 		listaCAux.push_front(careishon);
-		cout<<"======TERCERA CARA======"<<endl;
 		careishon.jEsimoV = auxmax;
 		listaCAux.push_front(careishon);
-		cout<<"======CUARTA CARA======"<<endl;
 		careishon.tamanoCara = abs(auxmax.x - auxmin.x)* abs(auxmax.z - auxmin.z);
 		careishon.jEsimoV = auxmin;
 		listaCAux.push_front(careishon);
-		cout<<"======QUINTA CARA======"<<endl;
 		careishon.jEsimoV = auxmax;
 		listaCAux.push_front(careishon);
-		cout<<"======SEXTA CARA======"<<endl;
 		pAux.setListaVertices(listaVAux);
-		cout<<"======LISTA VERTICES======"<<endl;
 		pAux.setCantidadVertices(8);
 		pAux.setlistaCaras(listaCAux);
-		cout<<"======POLIGONO TERMINADO======"<<endl;
 
 	}
 	else
