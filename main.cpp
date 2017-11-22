@@ -34,7 +34,7 @@ int main()
 	string lineIn, lineIn2;
 	while(on)
 	{
-		cout<<"$";
+		cout<<"$ ";
 		char comando[300];
 		cin.getline(comando,300);
 		char * pch;
@@ -126,11 +126,11 @@ int main()
 			if (milista.size()==5)
 			{
 				it++;
-				float x=stof(*it);
+				float x=atoi(*it);
 				it++;
-				float y=stof(*it);
+				float y=atoi(*it);
 				it++;
-				float z=stof(*it);
+				float z=atoi(*it);
 				it++;
 				lineIn=*it;
 				componente2Punto1(lineIn,poligonosMemoria,x,y,z,false);
@@ -138,11 +138,11 @@ int main()
 			else if (milista.size()==4)
 			{
 				it++;
-				float x=stof(*it);
+				float x=atoi(*it);
 				it++;
-				float y=stof(*it);
+				float y=atoi(*it);
 				it++;
-				float z=stof(*it);
+				float z=atoi(*it);
 				componente2Punto2(poligonosMemoria,x,y,z);
 			}
 		}
@@ -206,15 +206,13 @@ poligono cargarPoligono(string val, std::list<poligono> &poligonosMemoria)
 		pOut.setNombre(line);
 		getline (myfile,line);
 		cout<<"Cantidad de vertices: "<< line<<endl;
-		pOut.setCantidadVertices(stof(line.c_str()));
+		pOut.setCantidadVertices(atoi(line.c_str()));
 		bool terminado = false;
 		while (getline (myfile,line))
 		{
 			string strAcumX;
 			string strAcumY;
 			string strAcumZ;
-
-
 			if(line[0] == '-'&& line[1] == '1' && line.size() == 2){
 				break;
 			}
@@ -223,18 +221,18 @@ poligono cargarPoligono(string val, std::list<poligono> &poligonosMemoria)
 
 				if(line[i+1] == ' '){
 
-					vAux.x = stof(strAcumX.c_str());
+					vAux.x = atoi(strAcumX.c_str());
 					strAcumY += line[i+2];
 					for(int j = i+2; j <line.size(); j++){
 						if(line[j+1] == ' '){
 
-							vAux.y = stof(strAcumY.c_str());
+							vAux.y = atoi(strAcumY.c_str());
 							strAcumZ += line[j+2];
 							for(int k = j+2; k <line.size(); k++){
 								if(line[k+1] == ' '){
                                     vAux.indice = countE;
 									countE++;
-									vAux.z = stof(strAcumZ.c_str());
+									vAux.z = atoi(strAcumZ.c_str());
 									pOut.insertarVertice(vAux);
 									if(line[k+1] == ' '){
 										terminado = true;
@@ -281,19 +279,19 @@ poligono cargarPoligono(string val, std::list<poligono> &poligonosMemoria)
 				if(line[i+1]== ' ')
 					break;
 			}
-			cAux.tamanoCara = stof(cara.c_str());
+			cAux.tamanoCara = atoi(cara.c_str());
 			strAcumX2 += line[contCara];
 			for(int i = 1; i <=line.size(); i++){
 				if(line[i+1] == ' '){
-					cAux.v1 = (pOut.buscarVertice(stof(strAcumX2.c_str())));
+					cAux.v1 = (pOut.buscarVertice(atoi(strAcumX2.c_str())));
 					strAcumY2 += line[i+2];
 					for(int j = i+2; j <=line.size(); j++){
 						if(line[j+1] == ' '){
-							cAux.v2 = (pOut.buscarVertice(stof(strAcumY2.c_str())));
+							cAux.v2 = (pOut.buscarVertice(atoi(strAcumY2.c_str())));
 							strAcumZ2 += line[j+2];
 							for(int k = j+2; k <=line.size(); k++){
 								if(line[k+1] == ' ' ){
-									cAux.v3 = (pOut.buscarVertice(stof(strAcumZ2.c_str())));
+									cAux.v3 = (pOut.buscarVertice(atoi(strAcumZ2.c_str())));
 									pOut.insertarCara(cAux);
 									pOut.insertarArista(cAux.v1, cAux.v2);
 									pOut.insertarArista(cAux.v2, cAux.v3);
@@ -413,11 +411,9 @@ poligono envolvente(string nombreObjeto, list<poligono> listIn)
 	auxmax.x = 0;
 	auxmax.y = 0;
 	auxmax.z = 0;
-
 	auxmin.x = 10000;
 	auxmin.y = 10000;
 	auxmin.z = 10000;
-
 	vertice v1;
 	vertice v2;
 	vertice v3;
@@ -454,7 +450,6 @@ poligono envolvente(string nombreObjeto, list<poligono> listIn)
 			}
 		}
 		pObj = buscarPoligono2(listIn, nombreObjeto);
-
 		listaVAux.push_front(auxmax);
 		aux.x=auxmax.x;
 		aux.y=auxmin.y;
@@ -504,36 +499,18 @@ poligono envolvente(string nombreObjeto, list<poligono> listIn)
 	}
 	else if(buscarPoligono(listIn, nombreObjeto))
 	{
-<<<<<<< HEAD
-
 		int i=0;
 		pObj = buscarPoligono2(listIn, nombreObjeto);
         list<vertice> listaAuxx = pObj.getListaVertices();
-
 		for(itVert=listaAuxx.begin();itVert!=listaAuxx.end();itVert++)
-=======
-		int i=0;
-		pObj = buscarPoligono2(listIn, nombreObjeto);
-		for(itVert=pObj.getListaVertices().begin();itVert!=pObj.getListaVertices().end();itVert++)
->>>>>>> d01316e0e43e427367b74bf88c157e0188a1ef01
 		{
 
-
 			if(itVert->x>auxmax.x)
-<<<<<<< HEAD
 			{
-
 				auxmax.x=itVert->x;
 			}
 			if(itVert->y>auxmax.y)
 			{
-=======
-			{	
-				auxmax.x=itVert->x;
-			}
-			if(itVert->y>auxmax.y)
-			{	
->>>>>>> d01316e0e43e427367b74bf88c157e0188a1ef01
 				auxmax.y=itVert->y;
 			}
 			if(itVert->z>auxmax.z)
@@ -553,72 +530,49 @@ poligono envolvente(string nombreObjeto, list<poligono> listIn)
 				auxmin.z=itVert->z;
 			}
 			i++;
-
 		}
-
 		auxmax.indice = 0;
 		listaVAux.push_front(auxmax);
-<<<<<<< HEAD
 		v1 = auxmax;
-=======
->>>>>>> d01316e0e43e427367b74bf88c157e0188a1ef01
 		aux.x=auxmax.x;
 		aux.y=auxmin.y;
 		aux.z=auxmax.z;
 		aux.indice = 1;
 		listaVAux.push_front(aux);
-<<<<<<< HEAD
 		v2 = aux;
-=======
->>>>>>> d01316e0e43e427367b74bf88c157e0188a1ef01
 		aux.x=auxmax.x;
 		aux.y=auxmin.y;
 		aux.z=auxmin.z;
 		aux.indice = 2;
 		listaVAux.push_front(aux);
-<<<<<<< HEAD
 		v3 = aux;
-=======
->>>>>>> d01316e0e43e427367b74bf88c157e0188a1ef01
 		aux.x=auxmax.x;
 		aux.y=auxmax.y;
 		aux.z=auxmin.z;
         aux.indice = 3;
 		listaVAux.push_front(aux);
-<<<<<<< HEAD
 		v4 = aux;
-=======
->>>>>>> d01316e0e43e427367b74bf88c157e0188a1ef01
 		aux.x=auxmin.x;
 		aux.y=auxmax.y;
 		aux.z=auxmax.z;
 		aux.indice = 4;
 		listaVAux.push_front(aux);
-<<<<<<< HEAD
 		v5 = aux;
-=======
->>>>>>> d01316e0e43e427367b74bf88c157e0188a1ef01
 		aux.x=auxmin.x;
 		aux.y=auxmax.y;
 		aux.z=auxmin.z;
 		aux.indice = 5;
 		listaVAux.push_front(aux);
-<<<<<<< HEAD
 		v6 = aux;
-=======
->>>>>>> d01316e0e43e427367b74bf88c157e0188a1ef01
 		aux.x=auxmin.x;
 		aux.y=auxmin.y;
 		aux.z=auxmax.z;
 		aux.indice = 6;
 		listaVAux.push_front(aux);
-<<<<<<< HEAD
 		v7 = aux;
 		auxmin.indice = 7;
 		listaVAux.push_front(auxmin);
 		v8 = aux;
-
-
 		careishon.tamanoCara = pObj.tamCara(v1,v2,v3);
 		careishon.v1 = v1;
 		careishon.v2 = v2;
@@ -649,7 +603,6 @@ poligono envolvente(string nombreObjeto, list<poligono> listIn)
 		careishon.v2 = v7;
 		careishon.v3 = v8;
 		listaCAux.push_front(careishon);
-
         careishon.tamanoCara  = pObj.tamCara(v1,v2,v8);
 		careishon.v1 = v1;
 		careishon.v2 = v2;
@@ -680,27 +633,6 @@ poligono envolvente(string nombreObjeto, list<poligono> listIn)
 		careishon.v2 = v1;
 		careishon.v3 = v5;
 		listaCAux.push_front(careishon);
-
-
-
-=======
-		listaVAux.push_front(auxmin);
-		careishon.tamanoCara = abs(auxmax.x - auxmin.x)* abs(auxmax.y - auxmin.y);
-		careishon.jEsimoV = auxmin;
-		listaCAux.push_front(careishon);
-		careishon.jEsimoV = auxmax;
-		listaCAux.push_front(careishon);
-		careishon.tamanoCara = abs(auxmax.y - auxmin.y)* abs(auxmax.z - auxmin.z);
-		careishon.jEsimoV = auxmin;
-		listaCAux.push_front(careishon);
-		careishon.jEsimoV = auxmax;
-		listaCAux.push_front(careishon);
-		careishon.tamanoCara = abs(auxmax.x - auxmin.x)* abs(auxmax.z - auxmin.z);
-		careishon.jEsimoV = auxmin;
-		listaCAux.push_front(careishon);
-		careishon.jEsimoV = auxmax;
-		listaCAux.push_front(careishon);
->>>>>>> d01316e0e43e427367b74bf88c157e0188a1ef01
 		pAux.setListaVertices(listaVAux);
 		pAux.setCantidadVertices(8);
 		pAux.setlistaCaras(listaCAux);
@@ -807,5 +739,3 @@ float* calcularDistancia( float x, float y, float z, float x2, float y2, float z
     *out = abs(sqrt( pow((x2 - x),2) + pow((y2 - y),2) + pow((z2 - z),2)));
     return out;
 }
-
-
