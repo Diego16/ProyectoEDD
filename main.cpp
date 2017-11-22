@@ -182,7 +182,33 @@ int main()
 				componente2Punto3(lineIn,poligonosMemoria);
 			}
 			else
-				cout<< "Parametros invalidos"<<endl;
+				cout<< "~Parametros invalidos"<<endl;
+		}
+		else if(comando1=="ruta_corta")
+		{
+			if(milista.size()==4)
+			{
+				it++;
+				int i1=atoi(*it);
+				it++;
+				int i2=atoi(*it);
+				it++;
+				lineIn=*it;
+			}
+			else
+				cout<< "~Parametros invalidos"<<endl;
+		}
+		else if(comando1=="ruta_corta_centro")
+		{
+			if(milista.size()==4)
+			{
+				it++;
+				int i1=atoi(*it);
+				it++;
+				lineIn=*it;
+			}
+			else
+				cout<< "~Parametros invalidos"<<endl;
 		}
 		else if(comando1=="ayuda")
 		{
