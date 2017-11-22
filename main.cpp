@@ -6,6 +6,7 @@
 #include <string>
 #include <stdlib.h>
 #include <cmath>
+#include <cstring>
 using namespace std;
 
 poligono cargarPoligono(string val, list<poligono> &poligonosMemoria);
@@ -88,7 +89,7 @@ int main()
 			else if (milista.size()==1)
 			{
 				lineIn="all";
-				envolventes.push_front(envolvente(lineIn, poligonosMemoria));	
+				envolventes.push_front(envolvente(lineIn, poligonosMemoria));
 			}
 			else
 			{
@@ -205,13 +206,14 @@ poligono cargarPoligono(string val, std::list<poligono> &poligonosMemoria)
 		pOut.setNombre(line);
 		getline (myfile,line);
 		cout<<"Cantidad de vertices: "<< line<<endl;
-		pOut.setCantidadVertices(atoi(line.c_str()));
+		pOut.setCantidadVertices(stof(line.c_str()));
 		bool terminado = false;
 		while (getline (myfile,line))
 		{
 			string strAcumX;
 			string strAcumY;
 			string strAcumZ;
+
 
 			if(line[0] == '-'&& line[1] == '1' && line.size() == 2){
 				break;
@@ -221,19 +223,20 @@ poligono cargarPoligono(string val, std::list<poligono> &poligonosMemoria)
 
 				if(line[i+1] == ' '){
 
-					vAux.x = atoi(strAcumX.c_str());
+					vAux.x = stof(strAcumX.c_str());
 					strAcumY += line[i+2];
 					for(int j = i+2; j <line.size(); j++){
 						if(line[j+1] == ' '){
 
-							vAux.y = atoi(strAcumY.c_str());
+							vAux.y = stof(strAcumY.c_str());
 							strAcumZ += line[j+2];
 							for(int k = j+2; k <line.size(); k++){
-								if(line[k+1] == NULL || line[k+1] == ' '){
+								if(line[k+1] == ' '){
+                                    vAux.indice = countE;
 									countE++;
-									vAux.z = atoi(strAcumZ.c_str());
+									vAux.z = stof(strAcumZ.c_str());
 									pOut.insertarVertice(vAux);
-									if(line[k+1] == NULL){
+									if(line[k+1] == ' '){
 										terminado = true;
 										break;
 									}
@@ -278,20 +281,24 @@ poligono cargarPoligono(string val, std::list<poligono> &poligonosMemoria)
 				if(line[i+1]== ' ')
 					break;
 			}
-			cAux.tamanoCara = atoi(cara.c_str());
+			cAux.tamanoCara = stof(cara.c_str());
 			strAcumX2 += line[contCara];
 			for(int i = 1; i <=line.size(); i++){
 				if(line[i+1] == ' '){
-					cAux.jEsimoV.x = atoi(strAcumX2.c_str());
+					cAux.v1 = (pOut.buscarVertice(stof(strAcumX2.c_str())));
 					strAcumY2 += line[i+2];
 					for(int j = i+2; j <=line.size(); j++){
 						if(line[j+1] == ' '){
-							cAux.jEsimoV.y = atoi(strAcumY2.c_str());
+							cAux.v2 = (pOut.buscarVertice(stof(strAcumY2.c_str())));
 							strAcumZ2 += line[j+2];
 							for(int k = j+2; k <=line.size(); k++){
-								if(line[k+1] == NULL || line[k+1] == ' ' ){
-									cAux.jEsimoV.z = atoi(strAcumZ2.c_str());
+								if(line[k+1] == ' ' ){
+									cAux.v3 = (pOut.buscarVertice(stof(strAcumZ2.c_str())));
 									pOut.insertarCara(cAux);
+									pOut.insertarArista(cAux.v1, cAux.v2);
+									pOut.insertarArista(cAux.v2, cAux.v3);
+									pOut.insertarArista(cAux.v1, cAux.v3);
+									//cout<< " cantidad de aristas en memoria "<<pOut.getListaAristas().size()<<endl;
 									break;
 								}else
 								strAcumZ2 += line[k+1];
@@ -308,8 +315,9 @@ poligono cargarPoligono(string val, std::list<poligono> &poligonosMemoria)
 		}
 		myfile.close();
 	}
-	else 
+	else
 		cout << "Unable to open file";
+    //pOut.imprimeAristas();
 	return pOut;
 }
 bool buscarPoligono(list<poligono> listIn, string nombreIn)
@@ -344,10 +352,10 @@ bool guardarPoligono(string nombreObjeto, string nombreArchivo, list<poligono> l
 		myfile << pAux.getCantidadVertices()<<"\n";
 		listaVAux = pAux.getListaVertices();
 		listaCAux = pAux.getlistaCaras();
-		for(list<vertice>::iterator buscaIteraV = listaVAux.begin(); buscaIteraV != listaVAux.end();buscaIteraV++)
+		for(list<vertice>::reverse_iterator  buscaIteraV = listaVAux.rbegin(); buscaIteraV != listaVAux.rend();++buscaIteraV)
 			myfile <<(*buscaIteraV).x<<" " <<(*buscaIteraV).y<<" " <<(*buscaIteraV).z<<"\n";
-		for(list<cara>::iterator buscaIteraC = listaCAux.begin(); buscaIteraC != listaCAux.end();buscaIteraC++)
-			myfile <<(*buscaIteraC).tamanoCara<<" " <<(*buscaIteraC).jEsimoV.x<<" " <<(*buscaIteraC).jEsimoV.y<<" "<<(*buscaIteraC).jEsimoV.z<<"\n";
+		for(list<cara>::reverse_iterator  buscaIteraC = listaCAux.rbegin(); buscaIteraC != listaCAux.rend();++buscaIteraC)
+			myfile <<(*buscaIteraC).tamanoCara<<" " <<(*buscaIteraC).v1.indice<<" " <<(*buscaIteraC).v2.indice<<" "<<(*buscaIteraC).v3.indice<<"\n";
 		myfile <<"-1"<<"\n";
 		myfile.close();
 		return true;
@@ -360,6 +368,7 @@ bool guardarPoligono(string nombreObjeto, string nombreArchivo, list<poligono> l
 void listapoligonos(list<poligono> &poligonosMemoria)
 {
 	list<poligono>::iterator itPoli;
+    list<vertice> listaAux;
 	if(poligonosMemoria.size()<=0)
 	{
 		cout<<"No hay objetos cargados en memoria\n";
@@ -371,8 +380,11 @@ void listapoligonos(list<poligono> &poligonosMemoria)
 		cout<<"=======Listado de poligonos======="<<endl;
 		for(itPoli=poligonosMemoria.begin(); itPoli!=poligonosMemoria.end(); itPoli++)
 		{
-			cout<<"Nombre: "<<itPoli->getNombre()<<" Cantidad de vertices: "<<itPoli->getCantidadVertices()<<" Cantidad de caras: "<<itPoli->getCantidadCaras()<<endl;
-					/*<<" Cantidad de aristas: "<<itPoli->getCantidadAristas() TODO: imprimir cantidad de aristas*/
+			cout<<"Nombre: "<<itPoli->getNombre()<<" Cantidad de vertices: "<<itPoli->getCantidadVertices()<<" Cantidad de caras: "<<itPoli->getCantidadCaras()
+					<<" Cantidad de aristas: "<<itPoli->getListaAristas().size() <<endl;
+            listaAux = itPoli->getListaVertices();
+            //for(list<vertice>::iterator itV = listaAux.begin(); itV != listaAux.end(); itV++ )
+                //cout<<"vertice: "<<"x: "<< itV->x <<" y: "<< itV->y <<" z: "<< itV->z<<endl;
 		}
 		cout<<"=================================="<<endl;
 	}
@@ -397,7 +409,23 @@ void descargarmemoria(list<poligono> &poligonosMemoria, string nombre_objeto)
 poligono envolvente(string nombreObjeto, list<poligono> listIn)
 {
 	poligono pObj,pAux;
-	vertice auxmax={0,0,0}, auxmin={10000,10000,10000},aux;
+	vertice auxmax, auxmin,aux;
+	auxmax.x = 0;
+	auxmax.y = 0;
+	auxmax.z = 0;
+
+	auxmin.x = 10000;
+	auxmin.y = 10000;
+	auxmin.z = 10000;
+
+	vertice v1;
+	vertice v2;
+	vertice v3;
+	vertice v4;
+	vertice v5;
+	vertice v6;
+	vertice v7;
+	vertice v8;
 	list<vertice> listaVAux;
 	list<vertice>::iterator itVert;
 	list<cara> listaCAux;
@@ -426,6 +454,7 @@ poligono envolvente(string nombreObjeto, list<poligono> listIn)
 			}
 		}
 		pObj = buscarPoligono2(listIn, nombreObjeto);
+
 		listaVAux.push_front(auxmax);
 		aux.x=auxmax.x;
 		aux.y=auxmin.y;
@@ -452,6 +481,7 @@ poligono envolvente(string nombreObjeto, list<poligono> listIn)
 		aux.z=auxmax.z;
 		listaVAux.push_front(aux);
 		listaVAux.push_front(auxmin);
+		/*
 		careishon.tamanoCara = abs(auxmax.x - auxmin.x)* abs(auxmax.y - auxmin.y);
 		careishon.jEsimoV = auxmin;
 		listaCAux.push_front(careishon);
@@ -470,121 +500,159 @@ poligono envolvente(string nombreObjeto, list<poligono> listIn)
 		pAux.setListaVertices(listaVAux);
 		pAux.setCantidadVertices(8);
 		pAux.setlistaCaras(listaCAux);
+		*/
 	}
 	else if(buscarPoligono(listIn, nombreObjeto))
 	{
-		cout<<"======ENTRO ENVOLVENTE ARCHIVO======"<<endl;
+
 		int i=0;
 		pObj = buscarPoligono2(listIn, nombreObjeto);
-		cout<<pObj.getListaVertices().size()<<endl;
-		for(itVert=pObj.getListaVertices().begin();itVert!=pObj.getListaVertices().end();itVert++)
+        list<vertice> listaAuxx = pObj.getListaVertices();
+
+		for(itVert=listaAuxx.begin();itVert!=listaAuxx.end();itVert++)
 		{
-			cout<<"======ENTRO FOR por "<<i<<" vez ENVOLVENTE ARCHIVO======"<<endl;
-			cout<<"======X "<<itVert->x<<"======Y "<<itVert->y<<"======Z "<<itVert->z<<"===="<<endl;
+
+
 			if(itVert->x>auxmax.x)
-			{	
-				cout<<"======ENTRO IF X MAX======"<<endl;
+			{
+
 				auxmax.x=itVert->x;
 			}
-			else
-				cout<<"======NO ENTRO IF X MAX======"<<endl;
 			if(itVert->y>auxmax.y)
-			{	
-				cout<<"======ENTRO IF Y MAX======"<<endl;
+			{
 				auxmax.y=itVert->y;
 			}
-			else
-				cout<<"======NO ENTRO IF Y MAX======"<<endl;
 			if(itVert->z>auxmax.z)
 			{
-				cout<<"======ENTRO IF Z MAX======"<<endl;
 				auxmax.z=itVert->z;
 			}
-			else
-				cout<<"======NO ENTRO IF Z MAX======"<<endl;
 			if(itVert->x<auxmin.x)
 			{
-				cout<<"======ENTRO IF X MIN======"<<endl;
 				auxmin.x=itVert->x;
 			}
-			else
-				cout<<"======NO ENTRO IF X MIN======"<<endl;
 			if(itVert->y<auxmin.y)
 			{
-				cout<<"======ENTRO IF Y MIN======"<<endl;
 				auxmin.y=itVert->y;
 			}
-			else
-				cout<<"======NO ENTRO IF Y MIN======"<<endl;
 			if(itVert->z<auxmin.z)
 			{
-				cout<<"======ENTRO IF Z MIN======"<<endl;
 				auxmin.z=itVert->z;
 			}
-			else
-				cout<<"======NO ENTRO IF Z MIN======"<<endl;
 			i++;
+
 		}
+
+		auxmax.indice = 0;
 		listaVAux.push_front(auxmax);
-		cout<<"======MAXIMO PUNTO======"<<endl;
+		v1 = auxmax;
 		aux.x=auxmax.x;
 		aux.y=auxmin.y;
 		aux.z=auxmax.z;
+		aux.indice = 1;
 		listaVAux.push_front(aux);
-		cout<<"======PRIMER PUNTO======"<<endl;
+		v2 = aux;
 		aux.x=auxmax.x;
 		aux.y=auxmin.y;
 		aux.z=auxmin.z;
+		aux.indice = 2;
 		listaVAux.push_front(aux);
-		cout<<"======SEGUNDO PUNTO======"<<endl;
+		v3 = aux;
 		aux.x=auxmax.x;
 		aux.y=auxmax.y;
 		aux.z=auxmin.z;
+        aux.indice = 3;
 		listaVAux.push_front(aux);
-		cout<<"======TERCER PUNTO======"<<endl;
+		v4 = aux;
 		aux.x=auxmin.x;
 		aux.y=auxmax.y;
 		aux.z=auxmax.z;
+		aux.indice = 4;
 		listaVAux.push_front(aux);
-		cout<<"======CUARTO PUNTO======"<<endl;
+		v5 = aux;
 		aux.x=auxmin.x;
 		aux.y=auxmax.y;
 		aux.z=auxmin.z;
+		aux.indice = 5;
 		listaVAux.push_front(aux);
-		cout<<"======QUINTO PUNTO======"<<endl;
+		v6 = aux;
 		aux.x=auxmin.x;
 		aux.y=auxmin.y;
 		aux.z=auxmax.z;
+		aux.indice = 6;
 		listaVAux.push_front(aux);
-		cout<<"======SEXTO PUNTO======"<<endl;
+		v7 = aux;
+		auxmin.indice = 7;
 		listaVAux.push_front(auxmin);
-		cout<<"======MINIMO PUNTO======"<<endl;
-		careishon.tamanoCara = abs(auxmax.x - auxmin.x)* abs(auxmax.y - auxmin.y);
-		careishon.jEsimoV = auxmin;
+		v8 = aux;
+
+
+		careishon.tamanoCara = pObj.tamCara(v1,v2,v3);
+		careishon.v1 = v1;
+		careishon.v2 = v2;
+		careishon.v3 = v3;
 		listaCAux.push_front(careishon);
-		cout<<"======PRIMERA CARA======"<<endl;
-		careishon.jEsimoV = auxmax;
+		careishon.tamanoCara  = pObj.tamCara(v2,v3,v4);
+		careishon.v1 = v2;
+		careishon.v2 = v3;
+		careishon.v3 = v4;
 		listaCAux.push_front(careishon);
-		cout<<"======SEGUNDA CARA======"<<endl;
-		careishon.tamanoCara = abs(auxmax.y - auxmin.y)* abs(auxmax.z - auxmin.z);
-		careishon.jEsimoV = auxmin;
+		careishon.tamanoCara  = pObj.tamCara(v3,v4,v5);
+        careishon.v1 = v3;
+		careishon.v2 = v4;
+		careishon.v3 = v5;
 		listaCAux.push_front(careishon);
-		cout<<"======TERCERA CARA======"<<endl;
-		careishon.jEsimoV = auxmax;
+		careishon.tamanoCara  = pObj.tamCara(v4,v5,v6);
+        careishon.v1 = v4;
+		careishon.v2 = v5;
+		careishon.v3 = v6;
 		listaCAux.push_front(careishon);
-		cout<<"======CUARTA CARA======"<<endl;
-		careishon.tamanoCara = abs(auxmax.x - auxmin.x)* abs(auxmax.z - auxmin.z);
-		careishon.jEsimoV = auxmin;
+		careishon.tamanoCara  = pObj.tamCara(v5,v6,v7);
+        careishon.v1 = v5;
+		careishon.v2 = v6;
+		careishon.v3 = v7;
 		listaCAux.push_front(careishon);
-		cout<<"======QUINTA CARA======"<<endl;
-		careishon.jEsimoV = auxmax;
+        careishon.tamanoCara  = pObj.tamCara(v6,v7,v8);
+        careishon.v1 = v6;
+		careishon.v2 = v7;
+		careishon.v3 = v8;
 		listaCAux.push_front(careishon);
-		cout<<"======SEXTA CARA======"<<endl;
+
+        careishon.tamanoCara  = pObj.tamCara(v1,v2,v8);
+		careishon.v1 = v1;
+		careishon.v2 = v2;
+		careishon.v3 = v8;
+		listaCAux.push_front(careishon);
+		careishon.tamanoCara  = pObj.tamCara(v1,v8,v7);
+		careishon.v1 = v1;
+		careishon.v2 = v8;
+		careishon.v3 = v7;
+		listaCAux.push_front(careishon);
+		careishon.tamanoCara  = pObj.tamCara(v2,v4,v8);
+        careishon.v1 = v2;
+		careishon.v2 = v4;
+		careishon.v3 = v8;
+		listaCAux.push_front(careishon);
+		careishon.tamanoCara  = pObj.tamCara(v4,v8,v6);
+        careishon.v1 = v4;
+		careishon.v2 = v8;
+		careishon.v3 = v6;
+		listaCAux.push_front(careishon);
+		careishon.tamanoCara  = pObj.tamCara(v5,v3,v1);
+        careishon.v1 = v5;
+		careishon.v2 = v3;
+		careishon.v3 = v1;
+		listaCAux.push_front(careishon);
+        careishon.tamanoCara  = pObj.tamCara(v7,v1,v5);
+        careishon.v1 = v7;
+		careishon.v2 = v1;
+		careishon.v3 = v5;
+		listaCAux.push_front(careishon);
+
+
+
 		pAux.setListaVertices(listaVAux);
-		cout<<"======LISTA VERTICES======"<<endl;
 		pAux.setCantidadVertices(8);
 		pAux.setlistaCaras(listaCAux);
-		cout<<"======POLIGONO TERMINADO======"<<endl;
 
 	}
 	else
@@ -602,10 +670,10 @@ float* componente2Punto1(string nombrePoligono, list<poligono> poligonosMemoria,
          float* valorOut = new float;
          while(!listaP.empty())
          {
-            cout<<"listaP.front.x: "<< listaP.front().x<< endl;
-            cout<<"listaP.front.y: "<< listaP.front().y<< endl;
-            cout<<"listaP.front.z: "<< listaP.front().z<< endl;
-            cout<<"distancia calculada: "<< *(calcularDistancia(listaP.front().x, listaP.front().y, listaP.front().z, x, y, z))<< endl;
+            //cout<<"listaP.front.x: "<< listaP.front().x<< endl;
+            //cout<<"listaP.front.y: "<< listaP.front().y<< endl;
+            //cout<<"listaP.front.z: "<< listaP.front().z<< endl;
+            //cout<<"distancia calculada: "<< *(calcularDistancia(listaP.front().x, listaP.front().y, listaP.front().z, x, y, z))<< endl;
             arbolAux.insert(*(calcularDistancia(listaP.front().x, listaP.front().y, listaP.front().z, x, y, z)));
             listaP.pop_front();
          }
@@ -618,7 +686,7 @@ float* componente2Punto1(string nombrePoligono, list<poligono> poligonosMemoria,
          {
             if(arbolAux.min() == *calcularDistancia(listaP.front().x, listaP.front().y, listaP.front().z, x, y, z))
             {
-                cout<<"--Del poligono "<< nombrePoligono<< ", el vertice numero "<< i
+                cout<<"--Del poligono "<< nombrePoligono<< ", el vertice con indice "<<  listaP.front().indice
                 <<  " con coordenadas ["<< listaP.front().x<<", "<<listaP.front().y
                 <<", "<<listaP.front().z << "] es el mas cercano al punto [" <<x<<", "<<y<<", "<<z<<"] una distacia de "<< arbolAux.min() << " unidades--"<<endl;
                 return valorOut;
@@ -688,3 +756,5 @@ float* calcularDistancia( float x, float y, float z, float x2, float y2, float z
     *out = abs(sqrt( pow((x2 - x),2) + pow((y2 - y),2) + pow((z2 - z),2)));
     return out;
 }
+
+
