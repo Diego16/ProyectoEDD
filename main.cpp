@@ -12,7 +12,7 @@ using namespace std;
 poligono cargarPoligono(string val, list<poligono> &poligonosMemoria);
 string* tokenizador(string val);
 void listapoligonos(list<poligono> &poligonosMemoria);
-void descargarmemoria(list<poligono> &poligonosMemoria, string nombre_objeto);
+bool descargarmemoria(list<poligono> &poligonosMemoria, string nombre_objeto);
 bool buscarPoligono(list<poligono> listIn, string nombreIn);
 bool guardarPoligono(string nombreObjeto, string nombreArchivo, list<poligono> listIn);
 poligono buscarPoligono2(list<poligono> listIn, string nombreIn);
@@ -59,22 +59,24 @@ int main()
 				{
 					cout<<"No se cargó ningun poligono"<<endl;
 				}
+				else if(cargado.getNombre()=="wrongfile")
+				{
+					cout << "El archivo "<<lineIn<<" no existe o es ilegible."<<endl;
+				}
 				else if(cargado.getNombre()!="0a" && !poligonosMemoria.empty())
 				{
 					encontrado = buscarPoligono(poligonosMemoria,cargado.getNombre());
 				}
 				if(encontrado)
-					cout<<"Este poligono ya ha sido cargado anteriormente"<<endl;
+					cout<<"El objeto "<<cargado.getNombre()<<" ya ha sido cargado anteriormente"<<endl;
 				else if(!encontrado)
 				{
 					poligonosMemoria.push_front(cargado);
-					cout<<"Poligono cargado correctamente"<<endl;
+					cout<<"El objeto "<<cargado.getNombre()<<" ha sido cargado exitosamente del archivo "<<lineIn<<endl;
 				}
 			}
 			else
-			{
 				cout<< "Parametros invalidos"<<endl;
-			}
 		}
 		else if(comando1=="listado")
 			listapoligonos(poligonosMemoria);
@@ -92,21 +94,21 @@ int main()
 				envolventes.push_front(envolvente(lineIn, poligonosMemoria));
 			}
 			else
-			{
 				cout<< "Parametros invalidos"<<endl;
-			}
 		}
-		else if(comando1=="descargar"){
+		else if(comando1=="descargar")
+		{
 			if (milista.size()==2)
 			{
 				it++;
 				lineIn=*it;
-				descargarmemoria(poligonosMemoria,lineIn);
+				if(descargarmemoria(poligonosMemoria,lineIn))
+					cout<<"EL objeto "<<lineIn<<" ha sido eliminado de la memoria de trabajo."<<endl;
+				else
+					cout<<"El objeto "<<lineIn<<" no ha sido cargado en memoria."<<endl;
 			}
 			else
-			{
 				cout<< "Parametros invalidos"<<endl;
-			}
 		}
 		else if(comando1=="guardar")
 		{
@@ -116,7 +118,10 @@ int main()
 				lineIn=*it;
 				it++;
 				lineIn2=*it;
-				guardarPoligono(lineIn, lineIn2, poligonosMemoria);
+				if(guardarPoligono(lineIn, lineIn2, envolventes))
+					cout<<"La informacion del objeto "<<lineIn<<" ha sido guardada exitosamente en el archivo "<<lineIn2<<"."<<endl;
+				else
+					cout<<"El objeto "<<lineIn<<" no ha sido cargado en memoria."<<endl;
 			}
 			else
 				cout<< "Parametros invalidos"<<endl;
@@ -126,11 +131,11 @@ int main()
 			if (milista.size()==5)
 			{
 				it++;
-				float x=atoi(*it);
+				float x=stof(*it);
 				it++;
-				float y=atoi(*it);
+				float y=stof(*it);
 				it++;
-				float z=atoi(*it);
+				float z=stof(*it);
 				it++;
 				lineIn=*it;
 				componente2Punto1(lineIn,poligonosMemoria,x,y,z,false);
@@ -138,13 +143,15 @@ int main()
 			else if (milista.size()==4)
 			{
 				it++;
-				float x=atoi(*it);
+				float x=stof(*it);
 				it++;
-				float y=atoi(*it);
+				float y=stof(*it);
 				it++;
-				float z=atoi(*it);
+				float z=stof(*it);
 				componente2Punto2(poligonosMemoria,x,y,z);
 			}
+			else
+				cout<< "Parametros invalidos"<<endl;
 		}
 		else if(comando1=="v_cercanos_caja")
 		{
@@ -154,13 +161,17 @@ int main()
 				lineIn=*it;
 				componente2Punto3(lineIn,poligonosMemoria);
 			}
+			else
+				cout<< "Parametros invalidos"<<endl;
 		}
-		else if(comando1=="ayuda"){
+		else if(comando1=="ayuda")
+		{
 			if (milista.size()==1)
 			{
 				cout<<endl<<"Comandos disponibles: "<<endl<<"   cargar"<<endl<<"   listado"<<endl<<"   envolvente"<<endl<<"   descargar"<<endl<<"   guardar"<<endl<<"   v_cercano"<<endl<<"   v_cercanos_caja"<<endl<<"   salir"<<endl;
 			}
-			else if (milista.size()==2){
+			else if (milista.size()==2)
+			{
 				it++;
 				lineIn=*it;
 				if(lineIn=="cargar")
@@ -180,11 +191,13 @@ int main()
 				if(lineIn=="salir")
 					cout<<"===salir"<<endl<<"====Termina la ejecucion de la aplicacion."<<endl;
 			}
+			else
+				cout<< "Parametros invalidos"<<endl;
 		}
 		else if(comando1=="salir")
 			on = false;
 		else
-			cout<<"===Comando no valido"<<endl;
+			cout<<"Comando no valido"<<endl;
 	}
 	return 0;
 }
@@ -202,10 +215,8 @@ poligono cargarPoligono(string val, std::list<poligono> &poligonosMemoria)
 	if (myfile.is_open())
 	{
 		getline (myfile,line);
-		cout<<"Nombre: "<< line<<endl;
 		pOut.setNombre(line);
 		getline (myfile,line);
-		cout<<"Cantidad de vertices: "<< line<<endl;
 		pOut.setCantidadVertices(atoi(line.c_str()));
 		bool terminado = false;
 		while (getline (myfile,line))
@@ -213,46 +224,49 @@ poligono cargarPoligono(string val, std::list<poligono> &poligonosMemoria)
 			string strAcumX;
 			string strAcumY;
 			string strAcumZ;
-			if(line[0] == '-'&& line[1] == '1' && line.size() == 2){
+			if(line[0] == '-'&& line[1] == '1' && line.size() == 2)
+			{
 				break;
 			}
 			strAcumX += line[0];
-			for(int i = 0; i < line.size(); i++){
-
-				if(line[i+1] == ' '){
-
-					vAux.x = atoi(strAcumX.c_str());
+			for(int i = 0; i < line.size(); i++)
+			{
+				if(line[i+1] == ' ')
+				{
+					vAux.x = stof(strAcumX.c_str());
 					strAcumY += line[i+2];
-					for(int j = i+2; j <line.size(); j++){
+					for(int j = i+2; j <line.size(); j++)
+					{
 						if(line[j+1] == ' '){
-
-							vAux.y = atoi(strAcumY.c_str());
+							vAux.y = stof(strAcumY.c_str());
 							strAcumZ += line[j+2];
-							for(int k = j+2; k <line.size(); k++){
-								if(line[k+1] == ' '){
+							for(int k = j+2; k <line.size(); k++)
+							{
+								if(line[k+1] == ' ')
+								{
                                     vAux.indice = countE;
 									countE++;
-									vAux.z = atoi(strAcumZ.c_str());
+									vAux.z = stof(strAcumZ.c_str());
 									pOut.insertarVertice(vAux);
-									if(line[k+1] == ' '){
+									if(line[k+1] == ' ')
+									{
 										terminado = true;
 										break;
 									}
-
 									i = k;
 									strAcumX.clear();
 									strAcumY.clear();
 									strAcumZ.clear();
-                                    //strAcumX += line[i];
-
 									break;
-								}else
-								strAcumZ += line[k+1];
+								}
+								else
+									strAcumZ += line[k+1];
 							}
 
 							break;
-						}else
-						strAcumY += line[j+1];
+						}
+						else
+							strAcumY += line[j+1];
 					}
 					if(terminado)
 						break;
@@ -268,42 +282,51 @@ poligono cargarPoligono(string val, std::list<poligono> &poligonosMemoria)
 			string strAcumX2;
 			string strAcumY2;
 			string strAcumZ2;
-			if(line[0] == '-'&& line[1] == '1' && line.size() == 2){
+			if(line[0] == '-'&& line[1] == '1' && line.size() == 2)
+			{
 				break;
 			}
 			string cara;
 			int contCara = 0;
-			for(int i = 0; i < line.size(); i++){
+			for(int i = 0; i < line.size(); i++)
+			{
 				cara+= line[i];
 				contCara ++;
 				if(line[i+1]== ' ')
 					break;
 			}
-			cAux.tamanoCara = atoi(cara.c_str());
+			cAux.tamanoCara = stof(cara.c_str());
 			strAcumX2 += line[contCara];
-			for(int i = 1; i <=line.size(); i++){
-				if(line[i+1] == ' '){
-					cAux.v1 = (pOut.buscarVertice(atoi(strAcumX2.c_str())));
+			for(int i = 1; i <=line.size(); i++)
+			{
+				if(line[i+1] == ' ')
+				{
+					cAux.v1 = (pOut.buscarVertice(stof(strAcumX2.c_str())));
 					strAcumY2 += line[i+2];
-					for(int j = i+2; j <=line.size(); j++){
-						if(line[j+1] == ' '){
-							cAux.v2 = (pOut.buscarVertice(atoi(strAcumY2.c_str())));
+					for(int j = i+2; j <=line.size(); j++)
+					{
+						if(line[j+1] == ' ')
+						{
+							cAux.v2 = (pOut.buscarVertice(stof(strAcumY2.c_str())));
 							strAcumZ2 += line[j+2];
-							for(int k = j+2; k <=line.size(); k++){
-								if(line[k+1] == ' ' ){
-									cAux.v3 = (pOut.buscarVertice(atoi(strAcumZ2.c_str())));
+							for(int k = j+2; k <=line.size(); k++)
+							{
+								if(line[k+1] == ' ' )
+								{
+									cAux.v3 = (pOut.buscarVertice(stof(strAcumZ2.c_str())));
 									pOut.insertarCara(cAux);
 									pOut.insertarArista(cAux.v1, cAux.v2);
 									pOut.insertarArista(cAux.v2, cAux.v3);
 									pOut.insertarArista(cAux.v1, cAux.v3);
-									//cout<< " cantidad de aristas en memoria "<<pOut.getListaAristas().size()<<endl;
 									break;
-								}else
-								strAcumZ2 += line[k+1];
+								}
+								else
+									strAcumZ2 += line[k+1];
 							}
 							break;
-						}else
-						strAcumY2 += line[j+1];
+						}
+						else
+							strAcumY2 += line[j+1];
 					}
 					break;
 				}
@@ -314,13 +337,13 @@ poligono cargarPoligono(string val, std::list<poligono> &poligonosMemoria)
 		myfile.close();
 	}
 	else
-		cout << "Unable to open file";
-    //pOut.imprimeAristas();
+		pOut.setNombre("wrongfile");
 	return pOut;
 }
 bool buscarPoligono(list<poligono> listIn, string nombreIn)
 {
-	for(list<poligono>::iterator buscaItera = listIn.begin(); buscaItera != listIn.end();buscaItera++){
+	for(list<poligono>::iterator buscaItera = listIn.begin(); buscaItera != listIn.end();buscaItera++)
+	{
 		if((*buscaItera).getNombre() == nombreIn)
 			return true;
 	}
@@ -330,7 +353,8 @@ poligono buscarPoligono2(list<poligono> listIn, string nombreIn)
 {
 	poligono aux;
 	aux.inicializarPoligono();
-	for(list<poligono>::iterator buscaItera = listIn.begin(); buscaItera != listIn.end();buscaItera++){
+	for(list<poligono>::iterator buscaItera = listIn.begin(); buscaItera != listIn.end();buscaItera++)
+	{
 		if((*buscaItera).getNombre() == nombreIn)
 			return (*buscaItera);
 	}
@@ -358,8 +382,8 @@ bool guardarPoligono(string nombreObjeto, string nombreArchivo, list<poligono> l
 		myfile.close();
 		return true;
 	}
-	else{
-		cout<<"No se encontro el objeto en memoria"<<endl;
+	else
+	{
 		return false;
 	}
 }
@@ -378,16 +402,14 @@ void listapoligonos(list<poligono> &poligonosMemoria)
 		cout<<"=======Listado de poligonos======="<<endl;
 		for(itPoli=poligonosMemoria.begin(); itPoli!=poligonosMemoria.end(); itPoli++)
 		{
-			cout<<"Nombre: "<<itPoli->getNombre()<<" Cantidad de vertices: "<<itPoli->getCantidadVertices()<<" Cantidad de caras: "<<itPoli->getCantidadCaras()
-					<<" Cantidad de aristas: "<<itPoli->getListaAristas().size() <<endl;
+			cout<<"Nombre: "<<itPoli->getNombre()<<" Contiene: "<<itPoli->getCantidadVertices()<<" vertices, "<<itPoli->getListaAristas().size()
+					<<" aristas y "<<itPoli->getCantidadCaras() <<" caras."<<endl;
             listaAux = itPoli->getListaVertices();
-            //for(list<vertice>::iterator itV = listaAux.begin(); itV != listaAux.end(); itV++ )
-                //cout<<"vertice: "<<"x: "<< itV->x <<" y: "<< itV->y <<" z: "<< itV->z<<endl;
 		}
 		cout<<"=================================="<<endl;
 	}
 }
-void descargarmemoria(list<poligono> &poligonosMemoria, string nombre_objeto)
+bool descargarmemoria(list<poligono> &poligonosMemoria, string nombre_objeto)
 {
 	list<poligono>::iterator itPoli;
 	bool borrado = false;
@@ -400,9 +422,9 @@ void descargarmemoria(list<poligono> &poligonosMemoria, string nombre_objeto)
 		}
 	}
 	if(borrado)
-		cout<<"El objeto fue descargado exitosamente."<<endl;
+		return true;
 	else
-		cout<<"El objeto no fue encontrado para su descarga."<<endl;
+		return false;
 }
 poligono envolvente(string nombreObjeto, list<poligono> listIn)
 {
@@ -411,9 +433,9 @@ poligono envolvente(string nombreObjeto, list<poligono> listIn)
 	auxmax.x = 0;
 	auxmax.y = 0;
 	auxmax.z = 0;
-	auxmin.x = 10000;
-	auxmin.y = 10000;
-	auxmin.z = 10000;
+	auxmin.x = 100000;
+	auxmin.y = 100000;
+	auxmin.z = 100000;
 	vertice v1;
 	vertice v2;
 	vertice v3;
@@ -653,10 +675,6 @@ float* componente2Punto1(string nombrePoligono, list<poligono> poligonosMemoria,
          float* valorOut = new float;
          while(!listaP.empty())
          {
-            //cout<<"listaP.front.x: "<< listaP.front().x<< endl;
-            //cout<<"listaP.front.y: "<< listaP.front().y<< endl;
-            //cout<<"listaP.front.z: "<< listaP.front().z<< endl;
-            //cout<<"distancia calculada: "<< *(calcularDistancia(listaP.front().x, listaP.front().y, listaP.front().z, x, y, z))<< endl;
             arbolAux.insert(*(calcularDistancia(listaP.front().x, listaP.front().y, listaP.front().z, x, y, z)));
             listaP.pop_front();
          }
@@ -669,9 +687,8 @@ float* componente2Punto1(string nombrePoligono, list<poligono> poligonosMemoria,
          {
             if(arbolAux.min() == *calcularDistancia(listaP.front().x, listaP.front().y, listaP.front().z, x, y, z))
             {
-                cout<<"--Del poligono "<< nombrePoligono<< ", el vertice con indice "<<  listaP.front().indice
-                <<  " con coordenadas ["<< listaP.front().x<<", "<<listaP.front().y
-                <<", "<<listaP.front().z << "] es el mas cercano al punto [" <<x<<", "<<y<<", "<<z<<"] una distacia de "<< arbolAux.min() << " unidades--"<<endl;
+            	cout<<"El vertice "<<listaP.front().indice<<" ("<< listaP.front().x<<", "<<listaP.front().y<<") del objeto "<<nombrePoligono<<
+            		" es el mas cercano al punto("<<x<<", "<<y<<", "<<z<<") a una distacia de "<< arbolAux.min() <<endl;
                 return valorOut;
             }
             i++;
@@ -680,7 +697,7 @@ float* componente2Punto1(string nombrePoligono, list<poligono> poligonosMemoria,
     }
     else
     {
-        cout<<"El poligono no se encontro en memoria"<<endl;
+        cout<<"El objeto "<<nombrePoligono<<" no ha sido cargado en memoria"<<endl;
     }
     return 0;
 }
@@ -707,7 +724,7 @@ void componente2Punto2(list<poligono> poligonosMemoria, float x, float y, float 
     }
     else
     {
-        cout<<"No hay poligonos en memoria"<<endl;
+        cout<<"Ningun objeto ha sido cargado en memoria"<<endl;
     }
 }
 void componente2Punto3(string nombrePoligono,list<poligono> poligonosMemoria)
@@ -728,7 +745,6 @@ void componente2Punto3(string nombrePoligono,list<poligono> poligonosMemoria)
     }
     else
     {
-
         cout<<"El poligono no esta en memoria"<<endl;
     }
 
