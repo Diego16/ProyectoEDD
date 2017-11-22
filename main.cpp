@@ -504,22 +504,36 @@ poligono envolvente(string nombreObjeto, list<poligono> listIn)
 	}
 	else if(buscarPoligono(listIn, nombreObjeto))
 	{
+<<<<<<< HEAD
 
 		int i=0;
 		pObj = buscarPoligono2(listIn, nombreObjeto);
         list<vertice> listaAuxx = pObj.getListaVertices();
 
 		for(itVert=listaAuxx.begin();itVert!=listaAuxx.end();itVert++)
+=======
+		int i=0;
+		pObj = buscarPoligono2(listIn, nombreObjeto);
+		for(itVert=pObj.getListaVertices().begin();itVert!=pObj.getListaVertices().end();itVert++)
+>>>>>>> d01316e0e43e427367b74bf88c157e0188a1ef01
 		{
 
 
 			if(itVert->x>auxmax.x)
+<<<<<<< HEAD
 			{
 
 				auxmax.x=itVert->x;
 			}
 			if(itVert->y>auxmax.y)
 			{
+=======
+			{	
+				auxmax.x=itVert->x;
+			}
+			if(itVert->y>auxmax.y)
+			{	
+>>>>>>> d01316e0e43e427367b74bf88c157e0188a1ef01
 				auxmax.y=itVert->y;
 			}
 			if(itVert->z>auxmax.z)
@@ -544,42 +558,61 @@ poligono envolvente(string nombreObjeto, list<poligono> listIn)
 
 		auxmax.indice = 0;
 		listaVAux.push_front(auxmax);
+<<<<<<< HEAD
 		v1 = auxmax;
+=======
+>>>>>>> d01316e0e43e427367b74bf88c157e0188a1ef01
 		aux.x=auxmax.x;
 		aux.y=auxmin.y;
 		aux.z=auxmax.z;
 		aux.indice = 1;
 		listaVAux.push_front(aux);
+<<<<<<< HEAD
 		v2 = aux;
+=======
+>>>>>>> d01316e0e43e427367b74bf88c157e0188a1ef01
 		aux.x=auxmax.x;
 		aux.y=auxmin.y;
 		aux.z=auxmin.z;
 		aux.indice = 2;
 		listaVAux.push_front(aux);
+<<<<<<< HEAD
 		v3 = aux;
+=======
+>>>>>>> d01316e0e43e427367b74bf88c157e0188a1ef01
 		aux.x=auxmax.x;
 		aux.y=auxmax.y;
 		aux.z=auxmin.z;
         aux.indice = 3;
 		listaVAux.push_front(aux);
+<<<<<<< HEAD
 		v4 = aux;
+=======
+>>>>>>> d01316e0e43e427367b74bf88c157e0188a1ef01
 		aux.x=auxmin.x;
 		aux.y=auxmax.y;
 		aux.z=auxmax.z;
 		aux.indice = 4;
 		listaVAux.push_front(aux);
+<<<<<<< HEAD
 		v5 = aux;
+=======
+>>>>>>> d01316e0e43e427367b74bf88c157e0188a1ef01
 		aux.x=auxmin.x;
 		aux.y=auxmax.y;
 		aux.z=auxmin.z;
 		aux.indice = 5;
 		listaVAux.push_front(aux);
+<<<<<<< HEAD
 		v6 = aux;
+=======
+>>>>>>> d01316e0e43e427367b74bf88c157e0188a1ef01
 		aux.x=auxmin.x;
 		aux.y=auxmin.y;
 		aux.z=auxmax.z;
 		aux.indice = 6;
 		listaVAux.push_front(aux);
+<<<<<<< HEAD
 		v7 = aux;
 		auxmin.indice = 7;
 		listaVAux.push_front(auxmin);
@@ -650,6 +683,24 @@ poligono envolvente(string nombreObjeto, list<poligono> listIn)
 
 
 
+=======
+		listaVAux.push_front(auxmin);
+		careishon.tamanoCara = abs(auxmax.x - auxmin.x)* abs(auxmax.y - auxmin.y);
+		careishon.jEsimoV = auxmin;
+		listaCAux.push_front(careishon);
+		careishon.jEsimoV = auxmax;
+		listaCAux.push_front(careishon);
+		careishon.tamanoCara = abs(auxmax.y - auxmin.y)* abs(auxmax.z - auxmin.z);
+		careishon.jEsimoV = auxmin;
+		listaCAux.push_front(careishon);
+		careishon.jEsimoV = auxmax;
+		listaCAux.push_front(careishon);
+		careishon.tamanoCara = abs(auxmax.x - auxmin.x)* abs(auxmax.z - auxmin.z);
+		careishon.jEsimoV = auxmin;
+		listaCAux.push_front(careishon);
+		careishon.jEsimoV = auxmax;
+		listaCAux.push_front(careishon);
+>>>>>>> d01316e0e43e427367b74bf88c157e0188a1ef01
 		pAux.setListaVertices(listaVAux);
 		pAux.setCantidadVertices(8);
 		pAux.setlistaCaras(listaCAux);
