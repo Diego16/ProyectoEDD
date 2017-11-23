@@ -214,7 +214,7 @@ int main()
 		{
 			if (milista.size()==1)
 			{
-				cout<<endl<<"~Comandos disponibles: "<<endl<<"   cargar"<<endl<<"   listado"<<endl<<"   envolvente"<<endl<<"   descargar"<<endl<<"   guardar"<<endl<<"   v_cercano"<<endl<<"   v_cercanos_caja"<<endl<<"   salir"<<endl;
+				cout<<endl<<"~Comandos disponibles: "<<endl<<"   cargar"<<endl<<"   listado"<<endl<<"   envolvente"<<endl<<"   descargar"<<endl<<"   guardar"<<endl<<"   v_cercano"<<endl<<"   v_cercanos_caja"<<endl<<"   ruta_corta"<<endl<<"   ruta_corta_centro"<<endl<<"   salir"<<endl;
 			}
 			else if (milista.size()==2)
 			{
@@ -234,6 +234,10 @@ int main()
 					cout<<"===v_cercano <x y z nombre_objeto> / v_cercano <x y z>"<<endl<<"====Identifica el vértice del objeto nombre_objeto más cercano al punto indicado por las coordenadas px , py y pz. En caso de no ingresarse nombre_objeto se calcula el vertice mas cercano al punto entre todos los objetos"<<endl;
 				if(lineIn=="v_cercano_caja")
 					cout<<"===v_cercanos_caja <nombre_objeto>"<<endl<<"====Identifica los vértices del objeto nombre_objeto más cercanos a los puntos (vértices) que definen la respectiva caja envolvente del objeto."<<endl;
+				if(lineIn=="ruta_corta")
+					cout<<"===ruta_corta <i1 i2 nombre_objeto>"<<endl<<"====Identifica los índices de los vértices que conforman la ruta más corta entre los vértices dados para el objeto nombre_objeto."<<endl;
+				if(lineIn=="ruta_corta_centro")
+					cout<<"===ruta_corta_centro <i1 nombre_objeto>"<<endl<<"====Identifica los índices de los vértices que conforman la ruta más corta entre el vértice dado y el centro del objeto nombre_objeto."<<endl;
 				if(lineIn=="salir")
 					cout<<"===salir"<<endl<<"====Termina la ejecucion de la aplicacion."<<endl;
 			}
